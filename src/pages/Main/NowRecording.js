@@ -1,22 +1,26 @@
+import { useNavigation } from '@react-navigation/native';
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 
 const DiaryStartPage = () => {
+  const navigation = useNavigation()
+
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Ionicons name="mic-outline" size={48} color="#fff" />
-        <TouchableOpacity style={styles.closeButton}>
-          <Ionicons name="close-outline" size={36} color="#fff" />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.content}>
-        <Text style={styles.title}>일기 기록 시작하기</Text>
-        <Text style={styles.subtitle}>
-          아래의 버튼을 눌러서 오늘의 감정을 기록해보세요{'\n'}
-          원하는 언어로 AI와 편하게 이야기를 나누어 주시면 됩니다
-        </Text>
+      <View style={styles.topbox}>
+        <View style={styles.header}>
+          <Image source={require('../../assets/images/recording/record.png')} />
+          <TouchableOpacity style={styles.closeButton} onPress={() => { navigation.navigate('Recording') }}>
+            <Image source={require('../../assets/images/recording/delete.png')} />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.content}>
+          <Text style={styles.title}>일기 기록 시작하기</Text>
+          <Text style={styles.subtitle}>
+            아래의 버튼을 눌러서 오늘의 감정을 기록해보세요{'\n'}
+            원하는 언어로 AI와 편하게 이야기를 나누어 주시면 됩니다
+          </Text>
+        </View>
       </View>
       <TouchableOpacity style={styles.recordButton}>
         <Text style={styles.recordButtonText}>일기 기록하기</Text>
@@ -31,19 +35,20 @@ const styles = StyleSheet.create({
     backgroundColor: '#333',
     paddingTop: 60,
     paddingHorizontal: 20,
+    flexDirection: 'column',
     justifyContent: 'space-between',
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 15
   },
   closeButton: {
     padding: 10,
   },
   content: {
-    alignItems: 'center',
-    marginTop: 50,
+    alignItems: 'left',
   },
   title: {
     fontSize: 24,
@@ -52,21 +57,23 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 12,
     color: '#fff',
-    textAlign: 'center',
+    textAlign: 'left',
   },
   recordButton: {
-    backgroundColor: '#A593E0',
-    paddingVertical: 15,
+    height: 48,
+    backgroundColor: '#9199DD',
     borderRadius: 10,
     alignItems: 'center',
-    marginBottom: 30,
+    marginBottom: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   recordButtonText: {
     fontSize: 16,
     color: '#fff',
-    fontWeight: 'bold',
+    paddingBottom: 4
   },
 });
 

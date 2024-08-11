@@ -9,7 +9,7 @@ const Nav = () => {
 
     return (
         <View style={styles.navWrap}>
-            <TouchableOpacity style={styles.nav} onPress={() => {navigation.navigate(''); onChangePage()}} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.nav} onPress={() => {navigation.navigate('Recording'); onChangePage()}} activeOpacity={0.7}>
                 <Image style={styles.navimg} source={require('../assets/images/nav/record.png')} />
                 <CustomText style={styles.navtest}>감정기록</CustomText>
             </TouchableOpacity>
@@ -17,7 +17,7 @@ const Nav = () => {
                 <Image style={styles.navimg} source={require('../assets/images/nav/checkinfo.png')} />
                 <CustomText style={styles.navtest}>정보 조회</CustomText>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.nav} onPress={() => {navigation.navigate('Join'); onChangePage()}} activeOpacity={0.7}>
+            <TouchableOpacity style={styles.nav} onPress={() => {navigation.navigate('SearchCulture'); onChangePage()}} activeOpacity={0.7}>
                 <Image style={styles.navimg} source={require('../assets/images/nav/checkculture.png')} />
                 <CustomText style={styles.navtest}>문화 탐구</CustomText>
             </TouchableOpacity>
