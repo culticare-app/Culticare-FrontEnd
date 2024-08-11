@@ -1,8 +1,7 @@
-import React, { useState } from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
-import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler'
-import CustomText from '../../components/CustomText'
-import Nav from '../../components/Nav'
+import React, { useState, useRef, useEffect } from 'react';
+import { Image, StyleSheet, Text, View, Animated, TouchableOpacity, ScrollView, TextInput } from 'react-native';
+import CustomText from '../../components/CustomText';
+import Nav from '../../components/Nav';
 
 const InfoHeader = ({ tabnow }) => {
     return (
@@ -12,8 +11,8 @@ const InfoHeader = ({ tabnow }) => {
                 <Image source={require('../../assets/images/info/bookmark.png')} />
             </TouchableOpacity>
         </View>
-    )
-}
+    );
+};
 
 const InfoTab = ({ tabnow, setTabnow }) => {
     return (
@@ -28,17 +27,17 @@ const InfoTab = ({ tabnow, setTabnow }) => {
                 <CustomText style={tabnow === '채용 공고' ? tabs.textclick : tabs.text}>채용 공고</CustomText>
             </TouchableOpacity>
         </View>
-    )
-}
+    );
+};
 
 const InfoSearch = () => {
     return (
         <View style={searchs.search}>
             <Image style={searchs.searchimg} source={require('../../assets/images/info/search.png')} />
-            <TextInput style={searchs.searchinput} placeholder='검색' />
+            <TextInput style={searchs.searchinput} placeholder="검색" />
         </View>
-    )
-}
+    );
+};
 
 const InfoList = ({ setClick }) => {
     return (
@@ -77,17 +76,37 @@ const InfoList = ({ setClick }) => {
                 </TouchableOpacity>
             </View>
         </ScrollView>
-    )
-}
+    );
+};
 
+// 팝업 컴포넌트에 애니메이션 추가
 const InfoPop = ({ setClick }) => {
-    const [yesmark, setYesMark] = useState(false)
+    const [yesmark, setYesMark] = useState(false);
+    const slideAnim = useRef(new Animated.Value(-500)).current; // 시작 위치
+
+    useEffect(() => {
+        // 팝업이 화면에 나타날 때 슬라이드 애니메이션 시작
+        Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }, []);
+
+    const closePopUp = () => {
+        // 팝업이 닫힐 때 슬라이드 애니메이션
+        Animated.timing(slideAnim, {
+            toValue: -500,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => setClick(false)); // 애니메이션 종료 후 클릭 상태를 false로 설정
+    };
 
     return (
         <View style={pops.background}>
-            <View style={pops.pop_wrap}>
+            <Animated.View style={[pops.pop_wrap, { transform: [{ translateY: slideAnim }] }]}>
                 <View style={pops.box}>
-                    <TouchableOpacity onPress={() => { setClick(false) }}><Text>버튼</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={closePopUp}><Text>버튼</Text></TouchableOpacity>
                     <CustomText style={pops.title}>[고용노동부] 온열질환예방OPS(OnePageSheet) 17개 외국어</CustomText>
                     <CustomText style={pops.content}>
                         📢고용노동부에서 배포한여름철 폭염 온열질환 예방 가이드 안내입니다.온열질환 예방 가이드 17개 외국어 번역본을 제공하오니, 외국인 근로자에 대해 온열질환 예방 3대 예방수칙 및 폭염단계별 대응요령을 확인 가능하도록 현장에 게시하여주시기 바랍니다.
@@ -100,19 +119,37 @@ const InfoPop = ({ setClick }) => {
                         <CustomText style={yesmark ? pops.btntextclick : pops.btntext}>저장하기</CustomText>
                     </View>
                 </TouchableOpacity>
-            </View>
+            </Animated.View>
         </View>
-    )
-}
+    );
+};
 
+// 다른 팝업 컴포넌트들도 동일한 방식으로 애니메이션 적용 가능
 const CenterPop = ({ setClick }) => {
-    const [yesmark, setYesMark] = useState(false)
+    const [yesmark, setYesMark] = useState(false);
+    const slideAnim = useRef(new Animated.Value(-500)).current;
+
+    useEffect(() => {
+        Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }, []);
+
+    const closePopUp = () => {
+        Animated.timing(slideAnim, {
+            toValue: -500,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => setClick(false));
+    };
 
     return (
         <View style={pops.background}>
-            <View style={pops.pop_wrap}>
+            <Animated.View style={[pops.pop_wrap, { transform: [{ translateY: slideAnim }] }]}>
                 <View style={pops.box}>
-                    <TouchableOpacity onPress={() => { setClick(false) }}><Text>버튼</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={closePopUp}><Text>버튼</Text></TouchableOpacity>
                     <CustomText style={pops.title}>[고용노동부] 온열질환예방OPS(OnePageSheet) 17개 외국어</CustomText>
                     <CustomText style={pops.content}>
                         📢고용노동부에서 배포한여름철 폭염 온열질환 예방 가이드 안내입니다.온열질환 예방 가이드 17개 외국어 번역본을 제공하오니, 외국인 근로자에 대해 온열질환 예방 3대 예방수칙 및 폭염단계별 대응요령을 확인 가능하도록 현장에 게시하여주시기 바랍니다.
@@ -125,19 +162,36 @@ const CenterPop = ({ setClick }) => {
                         <CustomText style={yesmark ? pops.btntextclick : pops.btntext}>저장하기</CustomText>
                     </View>
                 </TouchableOpacity>
-            </View>
+            </Animated.View>
         </View>
-    )
-}
+    );
+};
 
 const EmployPop = ({ setClick }) => {
-    const [yesmark, setYesMark] = useState(false)
+    const [yesmark, setYesMark] = useState(false);
+    const slideAnim = useRef(new Animated.Value(-500)).current;
+
+    useEffect(() => {
+        Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }, []);
+
+    const closePopUp = () => {
+        Animated.timing(slideAnim, {
+            toValue: -500,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => setClick(false));
+    };
 
     return (
         <View style={pops.background}>
-            <View style={pops.pop_wrap}>
+            <Animated.View style={[pops.pop_wrap, { transform: [{ translateY: slideAnim }] }]}>
                 <View style={pops.box}>
-                    <TouchableOpacity onPress={() => { setClick(false) }}><Text>버튼</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={closePopUp}><Text>버튼</Text></TouchableOpacity>
                     <CustomText style={pops.title}>[고용노동부] 온열질환예방OPS(OnePageSheet) 17개 외국어</CustomText>
                     <CustomText style={pops.content}>
                         📢고용노동부에서 배포한여름철 폭염 온열질환 예방 가이드 안내입니다.온열질환 예방 가이드 17개 외국어 번역본을 제공하오니, 외국인 근로자에 대해 온열질환 예방 3대 예방수칙 및 폭염단계별 대응요령을 확인 가능하도록 현장에 게시하여주시기 바랍니다.
@@ -150,11 +204,10 @@ const EmployPop = ({ setClick }) => {
                         <CustomText style={yesmark ? pops.btntextclick : pops.btntext}>저장하기</CustomText>
                     </View>
                 </TouchableOpacity>
-            </View>
+            </Animated.View>
         </View>
-    )
-}
-
+    );
+};
 
 const PageNation = () => {
     const [currentPage, setCurrentPage] = React.useState(1);
@@ -202,8 +255,8 @@ const PageNation = () => {
 };
 
 const Info = () => {
-    const [click, setClick] = React.useState(true)
-    const [tabnow, setTabnow] = React.useState('지원센터')
+    const [click, setClick] = React.useState(false);
+    const [tabnow, setTabnow] = React.useState('지원센터');
 
     return (
         <>
@@ -224,19 +277,17 @@ const Info = () => {
                         <>
                             {click && tabnow === '채용 공고' ? (
                                 <EmployPop setClick={setClick} />
-                            ) : (
-                                <></>
-                            )}
+                            ) : null}
                         </>
                     )}
                 </>
             )}
             <Nav />
         </>
-    )
-}
+    );
+};
 
-export default Info
+export default Info;
 
 const styles = StyleSheet.create({
     Info_wrap: {
@@ -246,7 +297,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         padding: 20,
     }
-})
+});
 
 const headers = StyleSheet.create({
     header: {
@@ -257,40 +308,40 @@ const headers = StyleSheet.create({
     title: {
         fontSize: 20,
         color: '#000',
-        fontWeight: 'bold'
+        fontWeight: 'bold',
     }
-})
+});
 
 const tabs = StyleSheet.create({
     tabs_wrap: {
         flexDirection: 'row',
         borderRadius: 8,
         width: 335,
-        marginBottom: 20
+        marginBottom: 20,
     },
     btn: {
         backgroundColor: '#F5F5F5',
         width: 111,
         height: 44,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     btnclick: {
         width: 111,
         backgroundColor: '#303030',
         height: 44,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     text: {
         color: '#A0A0A0',
-        fontSize: 16
+        fontSize: 16,
     },
     textclick: {
         color: '#fff',
-        fontSize: 16
+        fontSize: 16,
     }
-})
+});
 
 const searchs = StyleSheet.create({
     search: {
@@ -302,25 +353,25 @@ const searchs = StyleSheet.create({
         borderBottomWidth: 1,
         paddingLeft: 5,
         paddingRight: 5,
-        marginBottom: 20
+        marginBottom: 20,
     },
     searchimg: {
         marginRight: 5,
-        marginBottom: 5
+        marginBottom: 5,
     },
     searchinput: {
         fontSize: 16,
     }
-})
+});
 
 const lists = StyleSheet.create({
     list_wrap: {
-        height: 355
+        height: 355,
     },
     listtitle: {
         fontSize: 16,
         color: '#A0A0A0',
-        fontFamily: 'Pretendard-Bold'
+        fontFamily: 'Pretendard-Bold',
     },
     list: {
         width: '100%',
@@ -328,13 +379,13 @@ const lists = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#F0F0F0',
         justifyContent: 'center',
-        fontFamily: 'Pretendard-Medium'
+        fontFamily: 'Pretendard-Medium',
     },
     text: {
         color: '#000',
-        fontSize: 15.5
+        fontSize: 15.5,
     }
-})
+});
 
 const pops = StyleSheet.create({
     background: {
@@ -345,7 +396,7 @@ const pops = StyleSheet.create({
         left: 0,
         top: 0,
         height: '100%',
-        justifyContent: 'flex-end'
+        justifyContent: 'flex-end',
     },
     pop_wrap: {
         zIndex: 11,
@@ -356,7 +407,7 @@ const pops = StyleSheet.create({
         borderTopLeftRadius: 40,
         padding: 20,
         paddingTop: 40,
-        position: 'relative'
+        position: 'relative',
     },
     title: {
         paddingBottom: 15,
@@ -370,14 +421,14 @@ const pops = StyleSheet.create({
         paddingTop: 15,
         fontSize: 16,
         color: '#000',
-        lineHeight: 22
+        lineHeight: 22,
     },
     btnbox: {
         position: 'absolute',
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
-        top: 60
+        top: 60,
     },
     btn: {
         flexDirection: 'row',
@@ -387,7 +438,7 @@ const pops = StyleSheet.create({
         borderWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 20
+        borderRadius: 20,
     },
     btnclick: {
         flexDirection: 'row',
@@ -397,22 +448,22 @@ const pops = StyleSheet.create({
         borderWidth: 1,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 20
+        borderRadius: 20,
     },
     btnimg: {
         width: 14,
         height: 18,
-        marginRight: 8
+        marginRight: 8,
     },
     btntext: {
         fontSize: 14,
-        color: '#303030'
+        color: '#303030',
     },
     btntextclick: {
         fontSize: 14,
-        color: '#fff'
+        color: '#fff',
     }
-})
+});
 
 const pages = StyleSheet.create({
     container: {
@@ -433,7 +484,7 @@ const pages = StyleSheet.create({
         marginHorizontal: 5,
         borderRadius: 500,
         paddingRight: 1,
-        paddingBottom: 1
+        paddingBottom: 1,
     },
     currentPage: {
         backgroundColor: '#000',
