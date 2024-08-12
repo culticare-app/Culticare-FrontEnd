@@ -1,16 +1,20 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Image, StyleSheet, TouchableOpacity, View } from 'react-native'
 import CustomText from '../../components/CustomText'
 import { TextInput } from 'react-native-gesture-handler'
 import Nav from '../../components/Nav'
 import { useNavigation } from '@react-navigation/native'
+import axios from 'axios'
+import { useRoute } from '@react-navigation/native';
+
+const URL = 'http://ec2-43-202-146-22.ap-northeast-2.compute.amazonaws.com:8082'
 
 const Header = () => {
     const navigation = useNavigation()
 
     return (
         <View style={headers.header_wrap}>
-            <TouchableOpacity onPress={() => {navigation.navigate('Community')}}>
+            <TouchableOpacity onPress={() => { navigation.navigate('Community') }}>
                 <Image source={require('../../assets/images/comm/back.png')} />
             </TouchableOpacity>
             <TouchableOpacity>
@@ -21,28 +25,80 @@ const Header = () => {
 }
 
 const Post = () => {
-    const [check, setCheck] = React.useState(false)
+    const [check, setCheck] = React.useState(false);
+    const [data, setData] = React.useState()
+    const route = useRoute();
+    const [loading, setLoading] = React.useState(false)
+    const { postId } = route.params;
+
+    useEffect(() => {
+        axios.get(`${URL}/posts/auth/${postId}`, {
+            headers: {
+                memberId: 'abc00'
+            }
+        })
+            .then((res) => {
+                setData(res.data)
+                setLoading(true)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }, [])
+
+    const HartSubmit = (like) => {
+        if (like) {
+            axios.post(`${URL}/posts/auth/like/${postId}`, {}, {
+                headers: {
+                    memberId: 'abc00',
+                }
+            })
+                .then((res) => {
+                    console.log(res);
+                    setCheck(!check)
+                })
+                .catch((err) => {
+                    console.log(err);
+                })
+        } else {
+            axios.delete(`${URL}/posts/auth/like/${postId}`, {
+                headers: {
+                    memberId: 'abc00'
+                }
+            })
+                .then((res) => {
+                    console.log(res);
+                    setCheck(!check)
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        }
+    }
 
     return (
-        <View style={posts.post_wrap}>
-            <CustomText style={posts.bigtage}>가족</CustomText>
-            <CustomText style={posts.title}>가족과의 갈등 해결</CustomText>
-            <CustomText style={posts.userid}>@imanna</CustomText>
-            <CustomText style={posts.content}>
-                가족과 갈등이 생겼을 때 어떻게 해결하시나요?
-                매번 문화 차이 때문에 특히 남편과 자주 다투는 것 같습니다..
-                여러분들의 조언을 듣고 싶습니다
-            </CustomText>
-            <View style={posts.tagebox}>
-                <CustomText style={posts.tage}>#갈등</CustomText>
-                <CustomText style={posts.tage}>#남편</CustomText>
-            </View>
-            <CustomText style={posts.time}>1분 전</CustomText>
-            <TouchableOpacity style={posts.hart_box} onPress={() => { setCheck(!(check)) }}>
-                <Image style={posts.hart} source={check ? require('../../assets/images/comm/hart_postfull.png') : require('../../assets/images/comm/hart_post.png')} />
-                <CustomText style={posts.count}>0</CustomText>
-            </TouchableOpacity>
-        </View>
+        <>
+            {loading ? (
+                <View style={posts.post_wrap}>
+                    <CustomText style={posts.bigtage}>{data.category}</CustomText>
+                    <CustomText style={posts.title}>{data.title}</CustomText>
+                    <CustomText style={posts.userid}>@{data.writerName}</CustomText>
+                    <CustomText style={posts.content}>
+                        {data.content}
+                    </CustomText>
+                    <View style={posts.tagebox}>
+                        <CustomText style={posts.tage}>{data.tags}</CustomText>
+                    </View>
+                    <CustomText style={posts.time}>{data.createdAt}</CustomText>
+                    <TouchableOpacity style={posts.hart_box} onPress={() => { HartSubmit(data.liked) }}>
+                        <Image style={posts.hart} source={data.liked ? require('../../assets/images/comm/hart_postfull.png') : require('../../assets/images/comm/hart_post.png')} />
+                        <CustomText style={posts.count}>{data.likeCount}</CustomText>
+                    </TouchableOpacity>
+                </View>
+            ) : (
+                <></>
+            )}
+        </>
     )
 }
 
