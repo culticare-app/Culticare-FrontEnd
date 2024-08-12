@@ -4,6 +4,9 @@ import Nav from '../../components/Nav';
 import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import CustomText from '../../components/CustomText';
+import axios from 'axios';
+
+const URL = 'http://ec2-43-202-146-22.ap-northeast-2.compute.amazonaws.com:8082'
 
 const Cate = ({ onChangeCate, onChangeChoose }) => {
     const categories = [
@@ -39,25 +42,29 @@ const Cate = ({ onChangeCate, onChangeChoose }) => {
     )
 };
 
-const Post = ({ tag, title, text, time, likes, comments }) => {
+const Post = ({ post }) => {
     const navigation = useNavigation()
+
+    const goToPost = (postId) => {
+        navigation.navigate('CommunityPost', { postId });
+    };
 
     return (
         <View style={styles.post_wrap}>
-            <TouchableOpacity onPress={() => {navigation.navigate('CommunityPost')}}>
-                <CustomText style={styles.tag}>{tag}</CustomText>
-                <CustomText style={styles.title}>{title}</CustomText>
-                <CustomText style={styles.text}>{text}</CustomText>
+            <TouchableOpacity style={styles.postbox} onPress={() => goToPost(post.id)}>
+                <CustomText style={styles.tag}>{post.category}</CustomText>
+                <CustomText style={styles.title}>{post.title}</CustomText>
+                <CustomText style={styles.text}>{post.content}</CustomText>
                 <View style={styles.infobox}>
                     <View style={styles.info}>
                         <Image style={styles.infoimg} source={require('../../assets/images/comm/hart.png')} />
-                        <CustomText style={styles.infotext}>{likes}</CustomText>
+                        <CustomText style={styles.infotext}>{post.likeCount}</CustomText>
                     </View>
                     <View style={styles.info}>
                         <Image style={styles.infoimg} source={require('../../assets/images/comm/comment.png')} />
-                        <CustomText style={styles.infotext}>{comments}</CustomText>
+                        <CustomText style={styles.infotext}>{post.view}</CustomText>
                     </View>
-                    <CustomText style={styles.infotext}>{time}</CustomText>
+                    <CustomText style={styles.infotext}>{post.createdAt}</CustomText>
                 </View>
             </TouchableOpacity>
         </View>
@@ -85,6 +92,7 @@ const CommHeader = ({ choose, setCate }) => {
 const Write = ({ setGowrite, choose }) => {
     const [title, setTitle] = React.useState('');
     const [content, setContent] = React.useState('')
+    const [tage, setTage] = React.useState('')
     const [full, setFull] = React.useState(false)
 
     useEffect(() => {
@@ -100,6 +108,26 @@ const Write = ({ setGowrite, choose }) => {
             Alert.alert('오류', '내용을 모두 채워주세요', [{ text: '확인' }]);
             return;
         }
+
+        axios.post(`${URL}/posts/auth/new`, {
+            "title": title,
+            "content": content,
+            "category": choose,
+            "writerName": "A",
+            "tags": tage
+        }, {
+            headers: {
+                memberId: 'abc00'
+            }
+        })
+            .then((res) => {
+                if (res.status === 200) {
+                    setGowrite(false)
+                }
+            })
+            .catch((err) => {
+                console.log(err);
+            });
     }
 
     return (
@@ -118,16 +146,22 @@ const Write = ({ setGowrite, choose }) => {
             <View style={writes.writebox}>
                 <TextInput
                     value={title}
-                    onChange={setTitle}
+                    onChangeText={(text) => setTitle(text)}
                     style={writes.titleinput}
-                    placeholder='제목'
+                    placeholder='제목을 입력해주세요'
                 />
                 <TextInput
                     value={content}
-                    onChange={setContent}
+                    onChangeText={(text) => setContent(text)}
                     multiline={true}
                     style={writes.contentinput}
                     placeholder='내용을 입력해주세요'
+                />
+                <TextInput
+                    value={tage}
+                    onChangeText={(text) => setTage(text)}
+                    style={writes.tageinput}
+                    placeholder='태그를 입력하세요'
                 />
             </View>
         </View>
@@ -137,24 +171,33 @@ const Write = ({ setGowrite, choose }) => {
 const Comm = () => {
     const [cate, setCate] = React.useState(false);
     const [choose, setChoose] = React.useState('커뮤니티');
-    const [Gowrite, setGowrite] = React.useState(false)
+    const [Gowrite, setGowrite] = React.useState(false);
+    const [post, setPost] = React.useState([])
 
-    const posts = Array(6).fill({
-        tag: '가족',
-        title: '아이가 학교에 적응을 하지 못 하는 것 같아요..',
-        text: '지난 주 이사를 왔는데 전학 간 학교에서 아직 적응을 하지 못 해 힘들어하는 것 같네요... 원래도 낯을 많이 가리는 성격이...',
-        time: '1분 전',
-        likes: '0',
-        comments: '0'
-    });
+    useEffect(() => {
+        axios.get(`${URL}/posts/list`, {
+            params: {
+                category: choose,
+                page: 0,
+                size: 30,
+                sort: []
+            }
+        })
+            .then((res) => {
+                setPost([...res.data.posts])
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    }, [choose]);
 
     return (
         <>
             <View style={styles.Comm_wrap}>
                 <CommHeader choose={choose} setCate={setCate} />
                 <ScrollView style={styles.main}>
-                    {posts.map((post, index) => (
-                        <Post key={index} {...post} />
+                    {post.map((post, index) => (
+                        <Post key={index} post={post} />
                     ))}
                 </ScrollView>
                 <TouchableOpacity
@@ -201,12 +244,17 @@ const styles = StyleSheet.create({
         marginLeft: 15
     },
     main: {
+        width: '100%',
         marginBottom: 90,
     },
     post_wrap: {
+        width: '100%',
         borderBlockColor: '#F0F0F0',
         borderBottomWidth: 1,
         padding: 20,
+    },
+    postbox: {
+        width: '100%'
     },
     tag: {
         width: 48,
@@ -216,7 +264,8 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: '#9199DD',
         borderRadius: 4,
-        marginBottom: 10
+        marginBottom: 10,
+        paddingTop: 1
     },
     title: {
         fontSize: 16,
@@ -343,7 +392,8 @@ const writes = StyleSheet.create({
     },
     btntext: {
         color: '#fff',
-        fontSize: 14
+        fontSize: 14,
+        marginTop: 3
     },
     writebox: {
         padding: 25,
@@ -357,10 +407,19 @@ const writes = StyleSheet.create({
     },
     contentinput: {
         width: 320,
-        height: 340,
+        height: 200,
         fontSize: 16,
         textAlignVertical: 'top',
         padding: 10,
-        paddingRight: 5
+        paddingRight: 5,
+        borderBottomWidth: 1,
+        borderBottomColor: '#C5C5C5',
+    },
+    tageinput: {
+        fontSize: 14,
+        textAlignVertical: 'top',
+        padding: 10,
+        paddingRight: 5,
+        color: 'blue'
     }
 })
