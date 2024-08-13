@@ -1,8 +1,11 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Image, StyleSheet, Text, View } from 'react-native'
 import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler'
 import CustomText from '../../components/CustomText'
 import Nav from '../../components/Nav'
+import axios from 'axios'
+
+const URL = 'http://ec2-43-202-146-22.ap-northeast-2.compute.amazonaws.com:8082'
 
 const InfoHeader = ({ tabnow }) => {
     return (
@@ -155,7 +158,6 @@ const EmployPop = ({ setClick }) => {
     )
 }
 
-
 const PageNation = () => {
     const [currentPage, setCurrentPage] = React.useState(1);
     const totalPages = 5;
@@ -202,8 +204,24 @@ const PageNation = () => {
 };
 
 const Info = () => {
-    const [click, setClick] = React.useState(true)
+    const [click, setClick] = React.useState(false)
     const [tabnow, setTabnow] = React.useState('지원센터')
+
+    useEffect(() => {
+        axios.get(`${URL}/info/welfare-center/list`, {
+            pageable : {
+                "page": 0,
+                "size": 12,
+                "sort": []
+            }
+        })
+            .then((res) => {
+                console.log(res.status)
+            })
+            .catch((err) => {
+                console.log(err)
+            })
+    }, [])
 
     return (
         <>
