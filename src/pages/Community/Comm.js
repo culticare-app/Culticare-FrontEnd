@@ -5,6 +5,7 @@ import { TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import { useNavigation } from '@react-navigation/native';
 import CustomText from '../../components/CustomText';
 import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const URL = 'http://ec2-43-202-146-22.ap-northeast-2.compute.amazonaws.com:8082'
 
@@ -90,6 +91,7 @@ const CommHeader = ({ choose, setCate }) => {
 }
 
 const Write = ({ setGowrite, choose }) => {
+    const accessToken = useSelector((state) => state.auth.accessToken)
     const [title, setTitle] = React.useState('');
     const [content, setContent] = React.useState('')
     const [tage, setTage] = React.useState('')
@@ -117,7 +119,7 @@ const Write = ({ setGowrite, choose }) => {
             "tags": tage
         }, {
             headers: {
-                memberId: 'abc00'
+                Authorization: `Bearer ${accessToken}`,
             }
         })
             .then((res) => {

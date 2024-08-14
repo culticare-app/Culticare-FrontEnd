@@ -14,34 +14,38 @@ import DiaryStartPage from './pages/Main/NowRecording.js';
 import Recording from './pages/Main/Recording.js';
 import EmotionAnalysisResultPage from './pages/Main/EmotionResult.js';
 import SearchingCult from './pages/SearchingCult/SearchingCult.js';
+import { Provider } from 'react-redux';
+import store from './Store/store.js';
 
 const Stack = createStackNavigator();
 
 function App() {
 	return (
-		<NavigationContainer>
-			<Stack.Navigator initialRouteName="Recording">
-				<Stack.Screen name="EmotionResultPage" component={EmotionAnalysisResultPage} />
-				<Stack.Screen name="DiaryStartPage" component={DiaryStartPage} />
-				<Stack.Screen name="Recording" component={Recording} />
+		<Provider store={store}>
+			<NavigationContainer>
+				<Stack.Navigator initialRouteName="Mypage">
+					<Stack.Screen name="EmotionResultPage" component={EmotionAnalysisResultPage} />
+					<Stack.Screen name="DiaryStartPage" component={DiaryStartPage} />
+					<Stack.Screen name="Recording" component={Recording} />
 
-				<Stack.Screen name="Nav" component={Nav} />
-				<Stack.Screen name="Login" component={Login} />
-				<Stack.Screen name="Join" component={Join} />
+					<Stack.Screen name="Nav" component={Nav} />
+					<Stack.Screen name="Login" component={Login} />
+					<Stack.Screen name="Join" component={Join} />
 
-				<Stack.Screen name="Community" component={Comm} />
-				<Stack.Screen name="CommunityPost" component={CommPost} />
-				<Stack.Screen name="CommunitySearch" component={CommSearch} />
+					<Stack.Screen name="Community" component={Comm} />
+					<Stack.Screen name="CommunityPost" component={CommPost} />
+					<Stack.Screen name="CommunitySearch" component={CommSearch} />
 
-				<Stack.Screen name="Mypage" component={Mypage} />
-				<Stack.Screen name="MemberInfo" component={MypageMemeber} />
-				<Stack.Screen name="MypageShare" component={Mypage} />
+					<Stack.Screen name="Mypage" component={Mypage} />
+					<Stack.Screen name="MemberInfo" component={MypageMemeber} />
+					<Stack.Screen name="MypageShare" component={Mypage} />
 
-				<Stack.Screen name="Info" component={Info} />
+					<Stack.Screen name="Info" component={Info} />
 
-				<Stack.Screen name="SearchCulture" component={SearchingCult} />
-			</Stack.Navigator>
-		</NavigationContainer>
+					<Stack.Screen name="SearchCulture" component={SearchingCult} />
+				</Stack.Navigator>
+			</NavigationContainer>
+		</Provider>
 	);
 }
 

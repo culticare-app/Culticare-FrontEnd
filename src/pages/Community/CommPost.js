@@ -6,6 +6,7 @@ import Nav from '../../components/Nav'
 import { useNavigation } from '@react-navigation/native'
 import axios from 'axios'
 import { useRoute } from '@react-navigation/native';
+import { useSelector } from 'react-redux'
 
 const URL = 'http://ec2-43-202-146-22.ap-northeast-2.compute.amazonaws.com:8082'
 
@@ -25,16 +26,19 @@ const Header = () => {
 }
 
 const Post = () => {
+    const accessToken = useSelector((state) => state.auth.accessToken)
     const [check, setCheck] = React.useState(false);
     const [data, setData] = React.useState()
     const route = useRoute();
     const [loading, setLoading] = React.useState(false)
     const { postId } = route.params;
 
+    console.log(accessToken)
+
     useEffect(() => {
         axios.get(`${URL}/posts/auth/${postId}`, {
             headers: {
-                memberId: 'abc00'
+                Authorization: `Bearer ${accessToken}`,
             }
         })
             .then((res) => {
@@ -50,7 +54,7 @@ const Post = () => {
         if (like) {
             axios.post(`${URL}/posts/auth/like/${postId}`, {}, {
                 headers: {
-                    memberId: 'abc00',
+                    Authorization: `Bearer ${accessToken}`,
                 }
             })
                 .then((res) => {
@@ -63,7 +67,7 @@ const Post = () => {
         } else {
             axios.delete(`${URL}/posts/auth/like/${postId}`, {
                 headers: {
-                    memberId: 'abc00'
+                    Authorization: `Bearer ${accessToken}`,
                 }
             })
                 .then((res) => {

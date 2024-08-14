@@ -1,7 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Image, StyleSheet, Text, View, Animated, TouchableOpacity, ScrollView, TextInput } from 'react-native';
-import CustomText from '../../components/CustomText';
-import Nav from '../../components/Nav';
+import React, { useState } from 'react'
+import { Image, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler'
+import CustomText from '../../components/CustomText'
+import Nav from '../../components/Nav'
 
 const InfoHeader = ({ tabnow }) => {
     return (
@@ -206,8 +207,9 @@ const EmployPop = ({ setClick }) => {
                 </TouchableOpacity>
             </Animated.View>
         </View>
-    );
-};
+    )
+}
+
 
 const PageNation = () => {
     const [currentPage, setCurrentPage] = React.useState(1);
@@ -255,8 +257,8 @@ const PageNation = () => {
 };
 
 const Info = () => {
-    const [click, setClick] = React.useState(false);
-    const [tabnow, setTabnow] = React.useState('지원센터');
+    const [click, setClick] = React.useState(true)
+    const [tabnow, setTabnow] = React.useState('지원센터')
 
     return (
         <>
