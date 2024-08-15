@@ -5,7 +5,7 @@ import { TextInput } from 'react-native-gesture-handler';
 import CustomText from '../../components/CustomText';
 import axios from 'axios';
 import { useDispatch } from 'react-redux';
-import { setTokens } from '../../Store/authSlice';
+import { setTokens } from '../../store/authSlice';
 
 const URL = 'http://ec2-43-202-146-22.ap-northeast-2.compute.amazonaws.com:8082'
 

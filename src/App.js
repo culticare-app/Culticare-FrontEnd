@@ -15,7 +15,8 @@ import Recording from './pages/Main/Recording.js';
 import EmotionAnalysisResultPage from './pages/Main/EmotionResult.js';
 import SearchingCult from './pages/SearchingCult/SearchingCult.js';
 import { Provider } from 'react-redux';
-import store from './Store/store.js';
+import store from './store/Store.js';
+
 
 const Stack = createStackNavigator();
 

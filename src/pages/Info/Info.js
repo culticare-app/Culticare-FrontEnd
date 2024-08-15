@@ -1,5 +1,5 @@
-import React, { useState } from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import React, { useState, useRef, useEffect } from 'react';
+import { Image, StyleSheet, Text, View, Animated } from 'react-native';
 import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler'
 import CustomText from '../../components/CustomText'
 import Nav from '../../components/Nav'

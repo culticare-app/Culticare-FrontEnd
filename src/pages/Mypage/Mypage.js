@@ -5,7 +5,7 @@ import CustomText from '../../components/CustomText'
 import { useNavigation } from '@react-navigation/native'
 import Nav from '../../components/Nav'
 import { useDispatch } from 'react-redux'
-import { clearTokens } from '../../Store/authSlice'
+import { clearTokens } from '../../store/authSlice'
 
 const Mypage = () => {
     const navigation = useNavigation();
