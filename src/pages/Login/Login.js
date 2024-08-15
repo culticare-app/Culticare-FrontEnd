@@ -42,7 +42,7 @@ const Login = () => {
                     onChangeMsg('');
                     const { accessToken, refreshToken, roles } = res.data;
                     dispatch(setTokens({ accessToken, refreshToken, roles }))
-                    navigation.navigate('Community')
+                    navigation.navigate('Recording')
                 } else {
                     onChangeMsg(`입력하신 아이디/비밀번호와 \n 일치하는 로그인 정보가 없습니다.`
                     )

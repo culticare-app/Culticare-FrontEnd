@@ -1,12 +1,20 @@
 import React, { useEffect } from 'react';
-import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, StyleSheet, Image, Modal } from 'react-native';
 import Nav from '../../components/Nav';
 import CustomText from '../../components/CustomText';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
+
+const URL = 'http://ec2-43-202-146-22.ap-northeast-2.compute.amazonaws.com:8082';
 
 const Recording = () => {
-    const [seapop, useSeapop] = React.useState(false)
-    const navigation = useNavigation()
+    const [seapop, useSeapop] = React.useState(false);
+    const [records, setRecords] = React.useState([]);
+    const [selectedRecord, setSelectedRecord] = React.useState(null);
+    const [isModalVisible, setIsModalVisible] = React.useState(false);
+    const navigation = useNavigation();
+    const accessToken = useSelector((state) => state.auth.accessToken);
 
     const getEmojiAndColor = (percentage) => {
         if (percentage < 30) {
@@ -18,13 +26,40 @@ const Recording = () => {
         }
     };
 
-    const records = [
-        { date: '2024.07.10', emotion: '우울감 24%', ...getEmojiAndColor(24) },
-        { date: '2024.07.09', emotion: '우울감 42%', ...getEmojiAndColor(42) },
-        { date: '2024.07.08', emotion: '우울감 56%', ...getEmojiAndColor(56) },
-        { date: '2024.07.07', emotion: '우울감 68%', ...getEmojiAndColor(68) },
-        { date: '2024.07.06', emotion: '우울감 72%', ...getEmojiAndColor(72) },
-    ];
+    useEffect(() => {
+        const fetchRecords = async () => {
+            try {
+                const response = await axios.get(`${URL}/diary/view`, {
+                    headers: {
+                        Authorization: `Bearer ${accessToken}`,
+                        'Accept': '*/*',
+                    },
+                });
+                const fetchedRecords = response.data.map((record) => ({
+                    id: record.id,
+                    date: new Date(record.createdAt).toLocaleDateString('ko-KR'),
+                    emotion: `우울감 ${record.depressionPercent}%`,
+                    content: record.content,
+                    ...getEmojiAndColor(record.depressionPercent),
+                }));
+                setRecords(fetchedRecords);
+            } catch (error) {
+                console.error('Error fetching records:', error);
+            }
+        };
+
+        fetchRecords();
+    }, [accessToken]);
+
+    const handleRecordPress = (record) => {
+        setSelectedRecord(record);
+        setIsModalVisible(true);
+    };
+
+    const closeModal = () => {
+        setIsModalVisible(false);
+        setSelectedRecord(null);
+    };
 
     return (
         <>
@@ -52,39 +87,56 @@ const Recording = () => {
 
                 <ScrollView style={styles.scrollView}>
                     {records.map((record, index) => (
-                        <View key={index} style={styles.record}>
-                            <CustomText style={styles.recordDate}>{record.date}</CustomText>
-                            <View style={styles.emotionbox}>
-                                <CustomText style={styles.recordEmotion}>{record.emotion}</CustomText>
-                                <View style={[styles.recordEmojiContainer, { backgroundColor: record.color }]}>
-                                    <CustomText style={styles.recordEmoji}>{record.emoji}</CustomText>
+                        <TouchableOpacity key={index} onPress={() => handleRecordPress(record)}>
+                            <View style={styles.record}>
+                                <CustomText style={styles.recordDate}>{record.date}</CustomText>
+                                <View style={styles.emotionbox}>
+                                    <CustomText style={styles.recordEmotion}>{record.emotion}</CustomText>
+                                    <View style={[styles.recordEmojiContainer, { backgroundColor: record.color }]}>
+                                        <CustomText style={styles.recordEmoji}>{record.emoji}</CustomText>
+                                    </View>
                                 </View>
                             </View>
-                        </View>
+                        </TouchableOpacity>
                     ))}
                 </ScrollView>
                 <Nav />
             </View>
             {seapop ? (
                 <SharePop useSeapop={useSeapop} />
-            ) : (
-                <></>
-            )}
+            ) : null}
+
+            <Modal
+                transparent={true}
+                visible={isModalVisible}
+                animationType="slide"
+                onRequestClose={closeModal}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <CustomText style={styles.modalTitle}>감정 기록 내용</CustomText>
+                        <Text style={styles.modalText}>{selectedRecord?.content}</Text>
+                        <TouchableOpacity style={styles.closeButton} onPress={closeModal}>
+                            <CustomText style={styles.closeButtonText}>닫기</CustomText>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
         </>
     );
 };
 
 const SharePop = ({ useSeapop }) => {
-    const [who, onChangeWho] = React.useState('')
-    const [full, setFull] = React.useState(false)
+    const [who, onChangeWho] = React.useState('');
+    const [full, setFull] = React.useState(false);
 
     useEffect(() => {
         if (who !== '') {
-            setFull(true)
+            setFull(true);
         } else {
             setFull(false);
         }
-    }, [who])
+    }, [who]);
 
     return (
         <View style={popups.popup_wrap}>
@@ -108,8 +160,8 @@ const SharePop = ({ useSeapop }) => {
                 </TouchableOpacity>
             </View>
         </View>
-    )
-}
+    );
+};
 
 const styles = StyleSheet.create({
     container: {
@@ -121,7 +173,7 @@ const styles = StyleSheet.create({
         backgroundColor: '#333',
         padding: 20,
         borderBottomRightRadius: 80,
-        paddingTop: 40
+        paddingTop: 40,
     },
     headerText: {
         fontSize: 22,
@@ -129,21 +181,21 @@ const styles = StyleSheet.create({
         color: '#fff',
         textAlign: 'center',
         marginBottom: 20,
-        textAlign: 'left'
+        textAlign: 'left',
     },
     headerbox: {
         marginTop: 40,
         marginBottom: 10,
         flexDirection: 'row',
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     subHeaderText: {
         fontSize: 12,
         color: '#fff',
     },
     headerimg: {
-        marginRight: 15
+        marginRight: 15,
     },
     recordContainer: {
         flexDirection: 'row',
@@ -156,14 +208,14 @@ const styles = StyleSheet.create({
     },
     recordingbox: {
         flexDirection: 'row',
-        alignItems: "center",
+        alignItems: 'center',
     },
     recentRecord: {
         fontSize: 16,
         fontWeight: 'bold',
         color: '#000',
         marginBottom: 3,
-        marginRight: 3
+        marginRight: 3,
     },
     scrollView: {
         marginTop: 10,
@@ -184,12 +236,12 @@ const styles = StyleSheet.create({
     },
     emotionbox: {
         flexDirection: 'row',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     recordEmotion: {
         fontSize: 16,
         color: '#000',
-        marginRight: 10
+        marginRight: 10,
     },
     recordEmojiContainer: {
         width: 40,
@@ -202,21 +254,35 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: '#fff',
     },
-    footer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        paddingVertical: 10,
-        backgroundColor: '#fff',
-        borderTopWidth: 1,
-        borderColor: '#E5E5E5',
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
-    footerButton: {
+    modalContent: {
+        width: 300,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        padding: 20,
         alignItems: 'center',
     },
-    footerButtonText: {
-        fontSize: 12,
-        color: '#888',
-        marginTop: 5,
+    modalTitle: {
+        fontSize: 20,
+        marginBottom: 10,
+    },
+    modalText: {
+        fontSize: 16,
+        marginBottom: 20,
+    },
+    closeButton: {
+        backgroundColor: '#333',
+        padding: 10,
+        borderRadius: 5,
+    },
+    closeButtonText: {
+        color: '#fff',
+        fontSize: 16,
     },
 });
 
@@ -229,7 +295,7 @@ const popups = StyleSheet.create({
         left: 0,
         backgroundColor: '#000000B8',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     popup: {
         width: 289,
@@ -237,23 +303,23 @@ const popups = StyleSheet.create({
         backgroundColor: '#fff',
         borderRadius: 28,
         padding: 18,
-        alignItems: 'center'
+        alignItems: 'center',
     },
     title: {
         marginTop: 5,
         fontSize: 20,
         color: '#000',
         marginBottom: 10,
-        fontFamily: 'Pretendard-Bold'
+        fontFamily: 'Pretendard-Bold',
     },
     descbox: {
-        marginBottom: 15
+        marginBottom: 15,
     },
     desc: {
         textAlign: 'center',
         fontSize: 15,
         color: '#A0A0A0',
-        fontFamily: 'Pretendard-Reqular'
+        fontFamily: 'Pretendard-Reqular',
     },
     input: {
         borderBottomColor: '#c5c5c5',
@@ -262,11 +328,7 @@ const popups = StyleSheet.create({
         paddingBottom: 5,
         marginBottom: 30,
         width: '100%',
-        textAlign: 'center'
-    },
-    placeholder: {
-        fontSize: 15,
-        color: '#C5C5C5'
+        textAlign: 'center',
     },
     sharebtn: {
         width: '100%',
@@ -275,7 +337,7 @@ const popups = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 8,
-        marginBottom: 5
+        marginBottom: 5,
     },
     sharebtnfull: {
         width: '100%',
@@ -284,7 +346,7 @@ const popups = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         borderRadius: 8,
-        marginBottom: 5
+        marginBottom: 5,
     },
     sharetext: {
         color: '#fff',
@@ -296,12 +358,12 @@ const popups = StyleSheet.create({
         width: '100%',
         height: 44,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
     },
     deletetext: {
         color: '#000',
         fontSize: 16,
-    }
+    },
 });
 
 export default Recording;

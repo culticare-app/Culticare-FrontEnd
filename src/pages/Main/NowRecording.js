@@ -171,7 +171,6 @@ const DiaryEndPage = ({ route, navigation }) => {
       >        
         <Text style={endStyles.analysisButtonText}>감정 분석 결과 보기</Text>
       </TouchableOpacity>
-      <Text style={endStyles.recordedTextConsole}>콘솔에 출력된 녹음된 내용: {recordedText}</Text>
     </View>
   );
 };

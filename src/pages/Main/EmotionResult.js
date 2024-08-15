@@ -1,45 +1,83 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { BarChart } from 'react-native-chart-kit';
 import { Dimensions } from 'react-native';
 import CustomText from '../../components/CustomText';
 import Nav from '../../components/Nav';
 import { useNavigation } from '@react-navigation/native';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const screenWidth = Dimensions.get('window').width;
 
-const data = {
-    datasets: [
-        {
-            data: [68, 56, 42, 24, 75, 30, 50],
-        },
-    ],
-};
-
-const chartConfig = {
-    backgroundGradientFrom: '#fff',
-    backgroundGradientTo: '#fff',
-    color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
-    barPercentage: 1,
-    fillShadowGradient: '#C5C5C5',
-    fillShadowGradientOpacity: 1,
-};
-
-const records = [
-    { date: '2024.07.11', emotion: '우울감 75%', emoji: '🙁', color: '#FA8080' },
-    { date: '2024.07.10', emotion: '우울감 24%', emoji: '😊', color: '#A1F394' },
-    { date: '2024.07.09', emotion: '우울감 42%', emoji: '🙂', color: '#BBBBBB' },
-    { date: '2024.07.08', emotion: '우울감 56%', emoji: '😐', color: '#BBBBBB' },
-    { date: '2024.07.07', emotion: '우울감 68%', emoji: '🙁', color: '#FA8080' },
-    { date: '2024.07.06', emotion: '우울감 72%', emoji: '☹️', color: '#FA8080' },
-    { date: '2024.07.04', emotion: '우울감 72%', emoji: '☹️', color: '#FA8080' },
-    { date: '2024.07.03', emotion: '우울감 72%', emoji: '☹️', color: '#FA8080' },
-    { date: '2024.07.02', emotion: '우울감 72%', emoji: '☹️', color: '#FA8080' },
-    { date: '2024.07.01', emotion: '우울감 72%', emoji: '☹️', color: '#FA8080' },
-];
-
 const EmotionAnalysisResultPage = () => {
-    const navigation = useNavigation()
+    const [records, setRecords] = useState([]);
+    const navigation = useNavigation();
+    const accessToken = useSelector((state) => state.auth.accessToken);
+
+    useEffect(() => {
+        const fetchRecords = async () => {
+            try {
+                const response = await axios.get('http://ec2-43-202-146-22.ap-northeast-2.compute.amazonaws.com:8082/diary/view', {
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Accept': '*/*',
+                    },
+                });
+                const fetchedRecords = response.data.map(record => ({
+                    date: new Date(record.createdAt).toLocaleDateString('ko-KR'),
+                    emotion: `우울감 ${record.depressionPercent}%`,
+                    emoji: getEmoji(record.depressionPercent),
+                    color: getColor(record.depressionPercent),
+                    depressionPercent: record.depressionPercent,
+                }));
+                setRecords(fetchedRecords.reverse());
+            } catch (error) {
+                console.error('Error fetching records:', error);
+            }
+        };
+
+        fetchRecords();
+    }, [accessToken]);
+
+    const getEmoji = (percentage) => {
+        if (percentage < 30) {
+            return '😊';
+        } else if (percentage < 70) {
+            return '🙂';
+        } else {
+            return '☹️';
+        }
+    };
+
+    const getColor = (percentage) => {
+        if (percentage < 30) {
+            return '#A1F394';
+        } else if (percentage < 70) {
+            return '#BBBBBB';
+        } else {
+            return '#FA8080';
+        }
+    };
+
+    const recentData = records.slice(0, 7).map(record => record.depressionPercent);
+
+    const data = {
+        datasets: [
+            {
+                data: recentData,
+            },
+        ],
+    };
+
+    const chartConfig = {
+        backgroundGradientFrom: '#fff',
+        backgroundGradientTo: '#fff',
+        color: (opacity = 1) => `rgba(0, 0, 0, ${opacity})`,
+        barPercentage: 1,
+        fillShadowGradient: '#C5C5C5',
+        fillShadowGradientOpacity: 1,
+    };
 
     return (
         <View style={styles.container}>
@@ -53,7 +91,7 @@ const EmotionAnalysisResultPage = () => {
 
             <View style={styles.dateSelector}>
                 <Image source={require('../../assets/images/recording/back.png')} />
-                <CustomText style={styles.dateText}>2024년 07월 11일</CustomText>
+                <CustomText style={styles.dateText}>최근 기록</CustomText>
                 <Image source={require('../../assets/images/recording/right.png')} />
             </View>
             <View style={styles.chartbox}>
