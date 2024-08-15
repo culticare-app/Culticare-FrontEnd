@@ -1,8 +1,10 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Image, StyleSheet, Text, View, Animated } from 'react-native';
 import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
 import CustomText from '../../components/CustomText';
 import Nav from '../../components/Nav';
+
+const API_BASE_URL = 'http://ec2-43-202-146-22.ap-northeast-2.compute.amazonaws.com:8082';
 
 const InfoHeader = ({ tabnow }) => {
     return (
@@ -40,28 +42,65 @@ const InfoSearch = () => {
     );
 };
 
-const InfoList = ({ setClick }) => {
-    const handlePress = () => {
-        setClick(true);
-    };
+const InfoList = ({ tabnow, setClick }) => {
+    const [data, setData] = useState([]);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            let endpoint = '';
+            let processResponse = (response) => [];
+
+            if (tabnow === '정보 조회') {
+                endpoint = '/info/education/list?page=0&size=1&sort=string';
+                processResponse = (response) => response.educations.map((item) => ({
+                    id: item.id,
+                    title: item.title,
+                }));
+            } else if (tabnow === '지원센터') {
+                endpoint = '/info/welfare-center/list?page=0&size=1&sort=string';
+                processResponse = (response) => response.welfareCenters.map((item) => ({
+                    id: item.id,
+                    name: item.name,
+                }));
+            } else if (tabnow === '채용 공고') {
+                endpoint = '/info/recruitment/list?page=0&size=1&sort=string';
+                processResponse = (response) => response.recruitments.map((item) => ({
+                    id: item.id,
+                    title: item.title,
+                }));
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}${endpoint}`);
+                const result = await response.json();
+                setData(processResponse(result));
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        fetchData();
+    }, [tabnow]);
 
     return (
         <ScrollView style={lists.list_wrap}>
-            <CustomText style={lists.listtitle}>최신 자료</CustomText>
+            <CustomText style={lists.listtitle}>{tabnow === '정보 조회' ? '최신 자료' : tabnow === '지원센터' ? '지원 센터 목록' : '채용 공고'}</CustomText>
             <View style={lists.listbox}>
-                <TouchableOpacity style={lists.list} onPress={handlePress}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                {/* 다른 항목들 */}
+                {data.map((item) => (
+                    <TouchableOpacity key={item.id} style={lists.list} onPress={() => setClick(true)}>
+                        <CustomText style={lists.text}>
+                            {tabnow === '정보 조회' ? item.title : tabnow === '지원센터' ? item.name : item.title}
+                        </CustomText>
+                    </TouchableOpacity>
+                ))}
             </View>
         </ScrollView>
     );
 };
 
-// 팝업 컴포넌트에 애니메이션 추가
 const InfoPop = ({ setClick }) => {
     const [yesmark, setYesMark] = useState(false);
-    const slideAnim = useRef(new Animated.Value(500)).current; // 화면 아래에서 시작하도록 설정
+    const slideAnim = useRef(new Animated.Value(500)).current;
 
     useEffect(() => {
         Animated.timing(slideAnim, {
@@ -73,7 +112,7 @@ const InfoPop = ({ setClick }) => {
 
     const closePopUp = () => {
         Animated.timing(slideAnim, {
-            toValue: 500, // 화면 아래로 내려가도록 설정
+            toValue: 500,
             duration: 300,
             useNativeDriver: true,
         }).start(() => setClick(false));
@@ -108,7 +147,6 @@ const InfoPop = ({ setClick }) => {
     );
 };
 
-// CenterPop 및 EmployPop 컴포넌트도 동일하게 수정합니다.
 const CenterPop = ({ setClick }) => {
     const [yesmark, setYesMark] = useState(false);
     const slideAnim = useRef(new Animated.Value(500)).current;
@@ -207,9 +245,8 @@ const EmployPop = ({ setClick }) => {
     );
 }
 
-
 const PageNation = () => {
-    const [currentPage, setCurrentPage] = React.useState(1);
+    const [currentPage, setCurrentPage] = useState(1);
     const totalPages = 5;
 
     const handlePagePress = (page) => {
@@ -254,8 +291,8 @@ const PageNation = () => {
 };
 
 const Info = () => {
-    const [click, setClick] = React.useState(false);
-    const [tabnow, setTabnow] = React.useState('지원센터');
+    const [click, setClick] = useState(false);
+    const [tabnow, setTabnow] = useState('지원센터');
 
     return (
         <>
@@ -263,7 +300,7 @@ const Info = () => {
                 <InfoHeader tabnow={tabnow} />
                 <InfoTab tabnow={tabnow} setTabnow={setTabnow} />
                 <InfoSearch />
-                <InfoList setClick={setClick} />
+                <InfoList tabnow={tabnow} setClick={setClick} />
                 <PageNation />
             </ScrollView>
             {click && tabnow === '정보 조회' ? (
