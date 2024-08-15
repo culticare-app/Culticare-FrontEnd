@@ -23,7 +23,7 @@ function App() {
 	return (
 		<Provider store={store}>
 			<NavigationContainer>
-				<Stack.Navigator initialRouteName="Mypage">
+				<Stack.Navigator initialRouteName="Login">
 					<Stack.Screen name="EmotionResultPage" component={EmotionAnalysisResultPage} />
 					<Stack.Screen name="DiaryStartPage" component={DiaryStartPage} />
 					<Stack.Screen name="Recording" component={Recording} />
