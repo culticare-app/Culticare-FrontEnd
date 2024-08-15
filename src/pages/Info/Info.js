@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react'
-import { Image, StyleSheet, Text, View } from 'react-native'
+import React, { useEffect, useState, useRef } from 'react'
+import { Image, StyleSheet, Text, View, Animated } from 'react-native'
 import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler'
 import CustomText from '../../components/CustomText'
 import Nav from '../../components/Nav'
@@ -61,12 +61,29 @@ const InfoList = ({ setClick, list, setClicklist }) => {
 
 const InfoPop = ({ setClick }) => {
     const [yesmark, setYesMark] = useState(false)
+    const slideAnim = useRef(new Animated.Value(500)).current;
+
+    useEffect(() => {
+        Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }, []);
+
+    const closePopUp = () => {
+        Animated.timing(slideAnim, {
+            toValue: 500,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => setClick(false));
+    };
 
     return (
         <View style={pops.background}>
-            <View style={pops.pop_wrap}>
+            <Animated.View style={[pops.pop_wrap, { transform: [{ translateY: slideAnim }] }]}>
                 <View style={pops.box}>
-                    <TouchableOpacity style={pops.downbtn} onPress={() => { setClick(false) }}><Image source={require('../../assets/images/search/button.png')} /></TouchableOpacity>
+                    <TouchableOpacity style={pops.downbtn} onPress={closePopUp}><Image source={require('../../assets/images/search/button.png')} /></TouchableOpacity>
                     <CustomText style={pops.title}>[고용노동부] 온열질환예방OPS(OnePageSheet) 17개 외국어</CustomText>
                     <CustomText style={pops.content}>
                         📢고용노동부에서 배포한여름철 폭염 온열질환 예방 가이드 안내입니다.온열질환 예방 가이드 17개 외국어 번역본을 제공하오니, 외국인 근로자에 대해 온열질환 예방 3대 예방수칙 및 폭염단계별 대응요령을 확인 가능하도록 현장에 게시하여주시기 바랍니다.
@@ -79,19 +96,36 @@ const InfoPop = ({ setClick }) => {
                         <CustomText style={yesmark ? pops.btntextclick : pops.btntext}>저장하기</CustomText>
                     </View>
                 </TouchableOpacity>
-            </View>
+            </Animated.View>
         </View>
     )
 }
 
 const CenterPop = ({ setClick, clicklist }) => {
     const [yesmark, setYesMark] = useState(false)
+    const slideAnim = useRef(new Animated.Value(500)).current;
+
+    useEffect(() => {
+        Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }, []);
+
+    const closePopUp = () => {
+        Animated.timing(slideAnim, {
+            toValue: 500,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => setClick(false));
+    };
 
     return (
         <View style={pops.background}>
-            <View style={pops.pop_wrap}>
+            <Animated.View style={[pops.pop_wrap, { transform: [{ translateY: slideAnim }] }]}>
                 <View style={pops.box}>
-                    <TouchableOpacity style={pops.downbtn} onPress={() => { setClick(false) }}><Image source={require('../../assets/images/search/button.png')} /></TouchableOpacity>
+                    <TouchableOpacity style={pops.downbtn} onPress={closePopUp}><Image source={require('../../assets/images/search/button.png')} /></TouchableOpacity>
                     <CustomText style={pops.title}>{clicklist.name}</CustomText>
                     <View style={pops.infobox}>
                         <Image source={require('../../assets/images/info/witch.png')} />
@@ -109,20 +143,37 @@ const CenterPop = ({ setClick, clicklist }) => {
                         <CustomText style={yesmark ? pops.btntextclick : pops.btntext}>저장하기</CustomText>
                     </View>
                 </TouchableOpacity>
-            </View>
+            </Animated.View>
         </View>
     )
 }
 
 const EmployPop = ({ setClick }) => {
     const [yesmark, setYesMark] = useState(false)
+    const slideAnim = useRef(new Animated.Value(500)).current;
+
+    useEffect(() => {
+        Animated.timing(slideAnim, {
+            toValue: 0,
+            duration: 300,
+            useNativeDriver: true,
+        }).start();
+    }, []);
+
+    const closePopUp = () => {
+        Animated.timing(slideAnim, {
+            toValue: 500,
+            duration: 300,
+            useNativeDriver: true,
+        }).start(() => setClick(false));
+    };
 
     return (
         <View style={pops.background}>
-            <View style={pops.pop_wrap}>
+            <Animated.View style={[pops.pop_wrap, { transform: [{ translateY: slideAnim }] }]}>
                 <View style={pops.box}>
-                    <TouchableOpacity style={pops.downbtn} onPress={() => { setClick(false) }}><Image source={require('../../assets/images/search/button.png')} /></TouchableOpacity>
-                    <CustomText style={pops.title}>[단오풍정] 세신을 배울 다문화가정 여성     모집</CustomText>
+                    <TouchableOpacity style={pops.downbtn} onPress={closePopUp}><Image source={require('../../assets/images/search/button.png')} /></TouchableOpacity>
+                    <CustomText style={pops.title}>[단오풍정] 세신을 배울 다문화가정 여성 모집</CustomText>
                     <View style={pops.employbox}><CustomText style={pops.employtext}>언어</CustomText><CustomText style={pops.employcontent}>vi</CustomText></View>
                     <View style={pops.employbox}><CustomText style={pops.employtext}>출신국가</CustomText><CustomText style={pops.employcontent}>vn,ph,kh,th,id,etc,</CustomText></View>
                     <View style={pops.employbox}><CustomText style={pops.employtext}>근무지역</CustomText><CustomText style={pops.employcontent}>seongbuk</CustomText></View>
@@ -138,7 +189,7 @@ const EmployPop = ({ setClick }) => {
                         <CustomText style={yesmark ? pops.btntextclick : pops.btntext}>저장하기</CustomText>
                     </View>
                 </TouchableOpacity>
-            </View>
+            </Animated.View>
         </View>
     )
 }
