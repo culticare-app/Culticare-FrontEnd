@@ -164,7 +164,7 @@ const DiaryEndPage = ({ route, navigation }) => {
         </TouchableOpacity>
       </View>
       <Text style={endStyles.recordingText}>기록이 종료되었습니다</Text>
-      <Text style={endStyles.thankYouText}>이야기를 들어줘서 고마워 :) 오늘 하루도 응원할게!</Text>
+      <Text style={endStyles.thankYouText}>이야기 해줘서 고마워 :)  오늘 하루도 응원할게!</Text>
       <TouchableOpacity 
         style={endStyles.analysisButton} 
         onPress={() => navigation.navigate('ReportPage', { recordedText })}

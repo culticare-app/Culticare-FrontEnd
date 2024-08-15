@@ -6,17 +6,18 @@ import { useNavigation } from '@react-navigation/native';
 import CustomText from '../../components/CustomText';
 import axios from 'axios';
 import { useSelector } from 'react-redux';
+import { format } from 'date-fns';
 
 const URL = 'http://ec2-43-202-146-22.ap-northeast-2.compute.amazonaws.com:8082'
 
 const Cate = ({ onChangeCate, onChangeChoose }) => {
     const categories = [
-        { name: '전체', img: require('../../assets/images/comm/cate_human.png') },
+        { name: '전체', img: require('../../assets/images/comm/all.png') },
         { name: '가족', img: require('../../assets/images/comm/cate_human.png') },
-        { name: '건강', img: require('../../assets/images/comm/cate_human.png') },
-        { name: '고민', img: require('../../assets/images/comm/cate_human.png') },
-        { name: '금전', img: require('../../assets/images/comm/cate_human.png') },
-        { name: '정책', img: require('../../assets/images/comm/cate_human.png') },
+        { name: '건강', img: require('../../assets/images/comm/pill.png') },
+        { name: '고민', img: require('../../assets/images/comm/worry.png') },
+        { name: '금전', img: require('../../assets/images/comm/coin.png') },
+        { name: '정책', img: require('../../assets/images/comm/policy.png') },
     ];
 
     return (
@@ -50,6 +51,8 @@ const Post = ({ post }) => {
         navigation.navigate('CommunityPost', { postId });
     };
 
+    const formattedDate = format(new Date(post.createdAt), 'yyyy년 M월 d일 HH시 mm분');
+
     return (
         <View style={styles.post_wrap}>
             <TouchableOpacity style={styles.postbox} onPress={() => goToPost(post.id)}>
@@ -65,7 +68,7 @@ const Post = ({ post }) => {
                         <Image style={styles.infoimg} source={require('../../assets/images/comm/comment.png')} />
                         <CustomText style={styles.infotext}>{post.view}</CustomText>
                     </View>
-                    <CustomText style={styles.infotext}>{post.createdAt}</CustomText>
+                    <CustomText style={styles.infotext}>{formattedDate}</CustomText>
                 </View>
             </TouchableOpacity>
         </View>
@@ -177,20 +180,38 @@ const Comm = () => {
     const [post, setPost] = React.useState([])
 
     useEffect(() => {
-        axios.get(`${URL}/posts/list`, {
-            params: {
-                category: choose,
-                page: 0,
-                size: 30,
-                sort: []
-            }
-        })
-            .then((res) => {
-                setPost([...res.data.posts])
+        if (choose === '커뮤니티' || choose === '전체') {
+            axios.get(`${URL}/posts/list/all`, {
+                params: {
+                    page: 0,
+                    size: 30,
+                    sort: []
+                }
             })
-            .catch((err) => {
-                console.log(err);
-            });
+                .then((res) => {
+                    setPost([...res.data.posts])
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        } else {
+            axios.get(`${URL}/posts/list`, {
+                params: {
+                    category: choose,
+                    page: 0,
+                    size: 30,
+                    sort: []
+                }
+            })
+                .then((res) => {
+                    console.log(res.data)
+                    setPost([...res.data.posts])
+                })
+                .catch((err) => {
+                    console.log(err);
+                });
+        }
+
     }, [choose]);
 
     return (

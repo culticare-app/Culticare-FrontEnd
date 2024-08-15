@@ -13,6 +13,7 @@ const Mypage = () => {
 
     const onLogout = () => {
         dispatch(clearTokens());
+        navigation.navigate('Login')
     }
 
     return (
@@ -30,9 +31,6 @@ const Mypage = () => {
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.btn} onPress={() => {onLogout()}}>
                         <CustomText style={styles.btntext}>로그아웃</CustomText>
-                    </TouchableOpacity>
-                    <TouchableOpacity style={styles.btn} onPress={() => {navigation.navigate('Login')}}>
-                        <CustomText style={styles.btntext}>로그인</CustomText>
                     </TouchableOpacity>
                 </View>
             </View>
