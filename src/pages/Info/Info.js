@@ -1,8 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Image, StyleSheet, Text, View, Animated } from 'react-native';
-import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler'
-import CustomText from '../../components/CustomText'
-import Nav from '../../components/Nav'
+import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-handler';
+import CustomText from '../../components/CustomText';
+import Nav from '../../components/Nav';
 
 const InfoHeader = ({ tabnow }) => {
     return (
@@ -41,40 +41,18 @@ const InfoSearch = () => {
 };
 
 const InfoList = ({ setClick }) => {
+    const handlePress = () => {
+        setClick(true);
+    };
+
     return (
         <ScrollView style={lists.list_wrap}>
             <CustomText style={lists.listtitle}>최신 자료</CustomText>
             <View style={lists.listbox}>
-                <TouchableOpacity style={lists.list} onPress={() => { setClick(true) }}>
+                <TouchableOpacity style={lists.list} onPress={handlePress}>
                     <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
                 </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
+                {/* 다른 항목들 */}
             </View>
         </ScrollView>
     );
@@ -83,10 +61,9 @@ const InfoList = ({ setClick }) => {
 // 팝업 컴포넌트에 애니메이션 추가
 const InfoPop = ({ setClick }) => {
     const [yesmark, setYesMark] = useState(false);
-    const slideAnim = useRef(new Animated.Value(-500)).current; // 시작 위치
+    const slideAnim = useRef(new Animated.Value(500)).current; // 화면 아래에서 시작하도록 설정
 
     useEffect(() => {
-        // 팝업이 화면에 나타날 때 슬라이드 애니메이션 시작
         Animated.timing(slideAnim, {
             toValue: 0,
             duration: 300,
@@ -95,29 +72,35 @@ const InfoPop = ({ setClick }) => {
     }, []);
 
     const closePopUp = () => {
-        // 팝업이 닫힐 때 슬라이드 애니메이션
         Animated.timing(slideAnim, {
-            toValue: -500,
+            toValue: 500, // 화면 아래로 내려가도록 설정
             duration: 300,
             useNativeDriver: true,
-        }).start(() => setClick(false)); // 애니메이션 종료 후 클릭 상태를 false로 설정
+        }).start(() => setClick(false));
+    };
+
+    const toggleMark = () => {
+        setYesMark(!yesmark);
+        console.log('Button clicked');
     };
 
     return (
         <View style={pops.background}>
             <Animated.View style={[pops.pop_wrap, { transform: [{ translateY: slideAnim }] }]}>
                 <View style={pops.box}>
-                    <TouchableOpacity onPress={closePopUp}><Text>버튼</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={closePopUp}>
+                        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>X</Text>
+                    </TouchableOpacity>
                     <CustomText style={pops.title}>[고용노동부] 온열질환예방OPS(OnePageSheet) 17개 외국어</CustomText>
                     <CustomText style={pops.content}>
                         📢고용노동부에서 배포한여름철 폭염 온열질환 예방 가이드 안내입니다.온열질환 예방 가이드 17개 외국어 번역본을 제공하오니, 외국인 근로자에 대해 온열질환 예방 3대 예방수칙 및 폭염단계별 대응요령을 확인 가능하도록 현장에 게시하여주시기 바랍니다.
                         출처 : 고용노동부
                     </CustomText>
                 </View>
-                <TouchableOpacity style={pops.btnbox} onPress={() => { setYesMark(!yesmark) }}>
+                <TouchableOpacity style={pops.btnbox} onPress={toggleMark}>
                     <View style={yesmark ? pops.btnclick : pops.btn}>
                         <Image style={pops.btnimg} source={yesmark ? require('../../assets/images/info/bookmark_full.png') : require('../../assets/images/info/bookmark.png')} />
-                        <CustomText style={yesmark ? pops.btntextclick : pops.btntext}>저장하기</CustomText>
+                        <CustomText style={yesmark ? pops.btntextclick : pops.btntext}>{yesmark ? "저장됨" : "저장하기"}</CustomText>
                     </View>
                 </TouchableOpacity>
             </Animated.View>
@@ -125,10 +108,10 @@ const InfoPop = ({ setClick }) => {
     );
 };
 
-// 다른 팝업 컴포넌트들도 동일한 방식으로 애니메이션 적용 가능
+// CenterPop 및 EmployPop 컴포넌트도 동일하게 수정합니다.
 const CenterPop = ({ setClick }) => {
     const [yesmark, setYesMark] = useState(false);
-    const slideAnim = useRef(new Animated.Value(-500)).current;
+    const slideAnim = useRef(new Animated.Value(500)).current;
 
     useEffect(() => {
         Animated.timing(slideAnim, {
@@ -140,27 +123,34 @@ const CenterPop = ({ setClick }) => {
 
     const closePopUp = () => {
         Animated.timing(slideAnim, {
-            toValue: -500,
+            toValue: 500,
             duration: 300,
             useNativeDriver: true,
         }).start(() => setClick(false));
+    };
+
+    const toggleMark = () => {
+        setYesMark(!yesmark);
+        console.log('Button clicked');
     };
 
     return (
         <View style={pops.background}>
             <Animated.View style={[pops.pop_wrap, { transform: [{ translateY: slideAnim }] }]}>
                 <View style={pops.box}>
-                    <TouchableOpacity onPress={closePopUp}><Text>버튼</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={closePopUp}>
+                        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>X</Text>
+                    </TouchableOpacity>
                     <CustomText style={pops.title}>[고용노동부] 온열질환예방OPS(OnePageSheet) 17개 외국어</CustomText>
                     <CustomText style={pops.content}>
                         📢고용노동부에서 배포한여름철 폭염 온열질환 예방 가이드 안내입니다.온열질환 예방 가이드 17개 외국어 번역본을 제공하오니, 외국인 근로자에 대해 온열질환 예방 3대 예방수칙 및 폭염단계별 대응요령을 확인 가능하도록 현장에 게시하여주시기 바랍니다.
                         출처 : 고용노동부
                     </CustomText>
                 </View>
-                <TouchableOpacity style={pops.btnbox} onPress={() => { setYesMark(!yesmark) }}>
+                <TouchableOpacity style={pops.btnbox} onPress={toggleMark}>
                     <View style={yesmark ? pops.btnclick : pops.btn}>
                         <Image style={pops.btnimg} source={yesmark ? require('../../assets/images/info/bookmark_full.png') : require('../../assets/images/info/bookmark.png')} />
-                        <CustomText style={yesmark ? pops.btntextclick : pops.btntext}>저장하기</CustomText>
+                        <CustomText style={yesmark ? pops.btntextclick : pops.btntext}>{yesmark ? "저장됨" : "저장하기"}</CustomText>
                     </View>
                 </TouchableOpacity>
             </Animated.View>
@@ -170,7 +160,7 @@ const CenterPop = ({ setClick }) => {
 
 const EmployPop = ({ setClick }) => {
     const [yesmark, setYesMark] = useState(false);
-    const slideAnim = useRef(new Animated.Value(-500)).current;
+    const slideAnim = useRef(new Animated.Value(500)).current;
 
     useEffect(() => {
         Animated.timing(slideAnim, {
@@ -182,32 +172,39 @@ const EmployPop = ({ setClick }) => {
 
     const closePopUp = () => {
         Animated.timing(slideAnim, {
-            toValue: -500,
+            toValue: 500,
             duration: 300,
             useNativeDriver: true,
         }).start(() => setClick(false));
+    };
+
+    const toggleMark = () => {
+        setYesMark(!yesmark);
+        console.log('Button clicked');
     };
 
     return (
         <View style={pops.background}>
             <Animated.View style={[pops.pop_wrap, { transform: [{ translateY: slideAnim }] }]}>
                 <View style={pops.box}>
-                    <TouchableOpacity onPress={closePopUp}><Text>버튼</Text></TouchableOpacity>
+                    <TouchableOpacity onPress={closePopUp}>
+                        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>X</Text>
+                    </TouchableOpacity>
                     <CustomText style={pops.title}>[고용노동부] 온열질환예방OPS(OnePageSheet) 17개 외국어</CustomText>
                     <CustomText style={pops.content}>
                         📢고용노동부에서 배포한여름철 폭염 온열질환 예방 가이드 안내입니다.온열질환 예방 가이드 17개 외국어 번역본을 제공하오니, 외국인 근로자에 대해 온열질환 예방 3대 예방수칙 및 폭염단계별 대응요령을 확인 가능하도록 현장에 게시하여주시기 바랍니다.
                         출처 : 고용노동부
                     </CustomText>
                 </View>
-                <TouchableOpacity style={pops.btnbox} onPress={() => { setYesMark(!yesmark) }}>
+                <TouchableOpacity style={pops.btnbox} onPress={toggleMark}>
                     <View style={yesmark ? pops.btnclick : pops.btn}>
                         <Image style={pops.btnimg} source={yesmark ? require('../../assets/images/info/bookmark_full.png') : require('../../assets/images/info/bookmark.png')} />
-                        <CustomText style={yesmark ? pops.btntextclick : pops.btntext}>저장하기</CustomText>
+                        <CustomText style={yesmark ? pops.btntextclick : pops.btntext}>{yesmark ? "저장됨" : "저장하기"}</CustomText>
                     </View>
                 </TouchableOpacity>
             </Animated.View>
         </View>
-    )
+    );
 }
 
 
@@ -257,8 +254,8 @@ const PageNation = () => {
 };
 
 const Info = () => {
-    const [click, setClick] = React.useState(true)
-    const [tabnow, setTabnow] = React.useState('지원센터')
+    const [click, setClick] = React.useState(false);
+    const [tabnow, setTabnow] = React.useState('지원센터');
 
     return (
         <>

@@ -10,7 +10,11 @@ import Info from './pages/Info/Info.js';
 import Mypage from './pages/Mypage/Mypage.js';
 import MypageMemeber from './pages/Mypage/MypageMemeber.js';
 import CommPost from './pages/Community/CommPost.js';
-import DiaryStartPage from './pages/Main/NowRecording.js';
+import DiaryStartPage from './pages/Main/NowRecording'; // 기본 내보내기 가져오기
+import { DiaryEndPage } from './pages/Main/NowRecording'; // 이름으로 내보내기 가져오기
+import ReportPage from './pages/Main/ReportPage';
+
+
 import Recording from './pages/Main/Recording.js';
 import EmotionAnalysisResultPage from './pages/Main/EmotionResult.js';
 import SearchingCult from './pages/SearchingCult/SearchingCult.js';
@@ -27,7 +31,11 @@ function App() {
 				<Stack.Navigator initialRouteName="Mypage">
 					<Stack.Screen name="EmotionResultPage" component={EmotionAnalysisResultPage} />
 					<Stack.Screen name="DiaryStartPage" component={DiaryStartPage} />
+					<Stack.Screen name="DiaryEndPage" component={DiaryEndPage} />
+					<Stack.Screen name="ReportPage" component={ReportPage} />
+
 					<Stack.Screen name="Recording" component={Recording} />
+
 
 					<Stack.Screen name="Nav" component={Nav} />
 					<Stack.Screen name="Login" component={Login} />

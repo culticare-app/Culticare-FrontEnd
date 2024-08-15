@@ -55,6 +55,8 @@ const DiaryStartPage = () => {
       if (isRecording) {
         await Voice.stop();
         setIsRecording(false);
+        console.log('Recorded Text:', recordedText);
+        navigation.navigate('DiaryEndPage', { recordedText });
       } else {
         setRecordedText('');
         await Voice.start(selectedLanguage);
@@ -149,6 +151,31 @@ const DiaryStartPage = () => {
   );
 };
 
+// 일기 끝내기 후 표시될 화면
+const DiaryEndPage = ({ route, navigation }) => {
+  const { recordedText } = route.params;
+
+  return (
+    <View style={endStyles.container}>
+      <View style={endStyles.header}>
+        <Image source={require('../../assets/images/recording/record.png')} />
+        <TouchableOpacity style={endStyles.closeButton} onPress={() => { navigation.goBack() }}>
+          <Image source={require('../../assets/images/recording/delete.png')} />
+        </TouchableOpacity>
+      </View>
+      <Text style={endStyles.recordingText}>기록이 종료되었습니다</Text>
+      <Text style={endStyles.thankYouText}>이야기를 들어줘서 고마워 :) 오늘 하루도 응원할게!</Text>
+      <TouchableOpacity 
+        style={endStyles.analysisButton} 
+        onPress={() => navigation.navigate('ReportPage', { recordedText })}
+      >        
+        <Text style={endStyles.analysisButtonText}>감정 분석 결과 보기</Text>
+      </TouchableOpacity>
+      <Text style={endStyles.recordedTextConsole}>콘솔에 출력된 녹음된 내용: {recordedText}</Text>
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -220,6 +247,10 @@ const styles = StyleSheet.create({
     color: '#fff',
     marginRight: 10,
   },
+  dropdownIcon: {
+    fontSize: 16,
+    color: '#fff',
+  },
   modalOverlay: {
     flex: 1,
     justifyContent: 'center',
@@ -230,9 +261,11 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     width: 250,
-    maxHeight: 200,
+    maxHeight: 300,
   },
   languagePickerItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 15,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
@@ -243,4 +276,56 @@ const styles = StyleSheet.create({
   },
 });
 
+const endStyles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#333',
+    paddingTop: 60,
+    paddingHorizontal: 20,
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  },
+  closeButton: {
+    padding: 10,
+  },
+  recordingText: {
+    fontSize: 16,
+    color: '#ccc',
+    marginTop: 0,
+  },
+  thankYouText: {
+    fontSize: 24,
+    color: '#fff',
+    marginTop: 20,
+    textAlign: 'center',
+  },
+  analysisButton: {
+    height: 48,
+    backgroundColor: '#9199DD',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 60,
+    width: '80%',
+  },
+  analysisButtonText: {
+    fontSize: 16,
+    color: '#fff',
+  },
+  recordedTextConsole: {
+    fontSize: 14,
+    color: '#fff',
+    marginTop: 40,
+    marginBottom: 40,
+    textAlign: 'center',
+  },
+});
+
 export default DiaryStartPage;
+export { DiaryEndPage };
