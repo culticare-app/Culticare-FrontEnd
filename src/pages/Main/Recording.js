@@ -8,12 +8,22 @@ const Recording = () => {
     const [seapop, useSeapop] = React.useState(false)
     const navigation = useNavigation()
 
+    const getEmojiAndColor = (percentage) => {
+        if (percentage < 30) {
+            return { emoji: '😊', color: '#A1F394' };
+        } else if (percentage < 70) {
+            return { emoji: '🙂', color: '#BBBBBB' };
+        } else {
+            return { emoji: '☹️', color: '#FA8080' };
+        }
+    };
+
     const records = [
-        { date: '2024.07.10', emotion: '우울감 24%', emoji: '😊', color: '#A1F394' },
-        { date: '2024.07.09', emotion: '우울감 42%', emoji: '🙂', color: '#BBBBBB' },
-        { date: '2024.07.08', emotion: '우울감 56%', emoji: '😐', color: '#BBBBBB' },
-        { date: '2024.07.07', emotion: '우울감 68%', emoji: '🙁', color: '#FA8080' },
-        { date: '2024.07.06', emotion: '우울감 72%', emoji: '☹️', color: '#FA8080' },
+        { date: '2024.07.10', emotion: '우울감 24%', ...getEmojiAndColor(24) },
+        { date: '2024.07.09', emotion: '우울감 42%', ...getEmojiAndColor(42) },
+        { date: '2024.07.08', emotion: '우울감 56%', ...getEmojiAndColor(56) },
+        { date: '2024.07.07', emotion: '우울감 68%', ...getEmojiAndColor(68) },
+        { date: '2024.07.06', emotion: '우울감 72%', ...getEmojiAndColor(72) },
     ];
 
     return (

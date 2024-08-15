@@ -3,8 +3,21 @@ import { View, Text, TouchableOpacity, StyleSheet, Image, ScrollView } from 'rea
 import { useNavigation } from '@react-navigation/native';
 
 const ReportPage = ({ route }) => {
-  const { recordedText } = route.params;
+  const { recordedText } = route.params; // 우울감 비율을 route.params에서 받아옴
   const navigation = useNavigation();
+
+  const depressionLevel = 50;
+  // 우울감 비율에 따른 이미지와 멘트 설정
+  let moodImage = require('../../assets/images/analysis/good.png');
+  let moodMessage = `측정된 Anna 님의 우울감은 ${depressionLevel}%로 우울감을 느끼지 않고 있습니다.`;
+
+  if (depressionLevel >= 70) {
+    moodImage = require('../../assets/images/analysis/sad.png');
+    moodMessage = `측정된 Anna 님의 우울감은 ${depressionLevel}%로 우울증에 대한 주의가 필요합니다.`;
+  } else if (depressionLevel < 70 && depressionLevel >= 30) {
+    moodImage = require('../../assets/images/analysis/soso.png');
+    moodMessage = `측정된 Anna 님의 우울감은 ${depressionLevel}%로 약간의 우울감을 느끼고 있습니다.`;
+  }
 
   return (
     <View style={styles.container}>
@@ -18,9 +31,9 @@ const ReportPage = ({ route }) => {
         </TouchableOpacity>
       </View>
       <View style={styles.content}>
-        <Image source={require('../../assets/images/analysis/sad.png')} style={styles.icon} />
+        <Image source={moodImage} style={styles.icon} />
         <Text style={styles.resultText}>
-          측정된 Anna 님의 우울감은 75%로 우울증에 대한 주의가 필요합니다
+          {moodMessage}
         </Text>
         <View style={styles.textContainer}>
           <ScrollView>
