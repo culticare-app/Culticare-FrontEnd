@@ -4,6 +4,7 @@ import { ScrollView, TextInput, TouchableOpacity } from 'react-native-gesture-ha
 import CustomText from '../../components/CustomText'
 import Nav from '../../components/Nav'
 import axios from 'axios'
+import { useSelector } from 'react-redux'
 
 const URL = 'http://ec2-43-202-146-22.ap-northeast-2.compute.amazonaws.com:8082'
 
@@ -43,42 +44,17 @@ const InfoSearch = () => {
     )
 }
 
-const InfoList = ({ setClick }) => {
+const InfoList = ({ setClick, list, setClicklist }) => {
     return (
         <ScrollView style={lists.list_wrap}>
             <CustomText style={lists.listtitle}>최신 자료</CustomText>
-            <View style={lists.listbox}>
-                <TouchableOpacity style={lists.list} onPress={() => { setClick(true) }}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-                <TouchableOpacity style={lists.list}>
-                    <CustomText style={lists.text}>[고용노동부] 온열질환예방OPS(OnePageSheet)...</CustomText>
-                </TouchableOpacity>
-            </View>
+            {list.map((list, key) => (
+                <View style={lists.listbox} key={key}>
+                    <TouchableOpacity style={lists.list} onPress={() => { setClick(true); setClicklist(list) }}>
+                        <CustomText style={lists.text}>{list.name}</CustomText>
+                    </TouchableOpacity>
+                </View>
+            ))}
         </ScrollView>
     )
 }
@@ -90,7 +66,7 @@ const InfoPop = ({ setClick }) => {
         <View style={pops.background}>
             <View style={pops.pop_wrap}>
                 <View style={pops.box}>
-                    <TouchableOpacity onPress={() => { setClick(false) }}><Text>버튼</Text></TouchableOpacity>
+                    <TouchableOpacity style={pops.downbtn} onPress={() => { setClick(false) }}><Image source={require('../../assets/images/search/button.png')} /></TouchableOpacity>
                     <CustomText style={pops.title}>[고용노동부] 온열질환예방OPS(OnePageSheet) 17개 외국어</CustomText>
                     <CustomText style={pops.content}>
                         📢고용노동부에서 배포한여름철 폭염 온열질환 예방 가이드 안내입니다.온열질환 예방 가이드 17개 외국어 번역본을 제공하오니, 외국인 근로자에 대해 온열질환 예방 3대 예방수칙 및 폭염단계별 대응요령을 확인 가능하도록 현장에 게시하여주시기 바랍니다.
@@ -108,19 +84,24 @@ const InfoPop = ({ setClick }) => {
     )
 }
 
-const CenterPop = ({ setClick }) => {
+const CenterPop = ({ setClick, clicklist }) => {
     const [yesmark, setYesMark] = useState(false)
 
     return (
         <View style={pops.background}>
             <View style={pops.pop_wrap}>
                 <View style={pops.box}>
-                    <TouchableOpacity onPress={() => { setClick(false) }}><Text>버튼</Text></TouchableOpacity>
-                    <CustomText style={pops.title}>[고용노동부] 온열질환예방OPS(OnePageSheet) 17개 외국어</CustomText>
-                    <CustomText style={pops.content}>
-                        📢고용노동부에서 배포한여름철 폭염 온열질환 예방 가이드 안내입니다.온열질환 예방 가이드 17개 외국어 번역본을 제공하오니, 외국인 근로자에 대해 온열질환 예방 3대 예방수칙 및 폭염단계별 대응요령을 확인 가능하도록 현장에 게시하여주시기 바랍니다.
-                        출처 : 고용노동부
-                    </CustomText>
+                    <TouchableOpacity style={pops.downbtn} onPress={() => { setClick(false) }}><Image source={require('../../assets/images/search/button.png')} /></TouchableOpacity>
+                    <CustomText style={pops.title}>{clicklist.name}</CustomText>
+                    <View style={pops.infobox}>
+                        <Image source={require('../../assets/images/info/witch.png')} />
+                        <CustomText style={pops.content}>{clicklist.address}</CustomText>
+                    </View>
+                    <View style={pops.infobox}>
+                        <Image source={require('../../assets/images/info/tel.png')} />
+                        <CustomText style={pops.content}>{clicklist.telephone}</CustomText>
+                    </View>
+                    <Image style={pops.mapimg} source={require('../../assets/images/info/kakao.jpg')} />
                 </View>
                 <TouchableOpacity style={pops.btnbox} onPress={() => { setYesMark(!yesmark) }}>
                     <View style={yesmark ? pops.btnclick : pops.btn}>
@@ -140,12 +121,16 @@ const EmployPop = ({ setClick }) => {
         <View style={pops.background}>
             <View style={pops.pop_wrap}>
                 <View style={pops.box}>
-                    <TouchableOpacity onPress={() => { setClick(false) }}><Text>버튼</Text></TouchableOpacity>
-                    <CustomText style={pops.title}>[고용노동부] 온열질환예방OPS(OnePageSheet) 17개 외국어</CustomText>
-                    <CustomText style={pops.content}>
-                        📢고용노동부에서 배포한여름철 폭염 온열질환 예방 가이드 안내입니다.온열질환 예방 가이드 17개 외국어 번역본을 제공하오니, 외국인 근로자에 대해 온열질환 예방 3대 예방수칙 및 폭염단계별 대응요령을 확인 가능하도록 현장에 게시하여주시기 바랍니다.
-                        출처 : 고용노동부
-                    </CustomText>
+                    <TouchableOpacity style={pops.downbtn} onPress={() => { setClick(false) }}><Image source={require('../../assets/images/search/button.png')} /></TouchableOpacity>
+                    <CustomText style={pops.title}>[단오풍정] 세신을 배울 다문화가정 여성     모집</CustomText>
+                    <View style={pops.employbox}><CustomText style={pops.employtext}>언어</CustomText><CustomText style={pops.employcontent}>vi</CustomText></View>
+                    <View style={pops.employbox}><CustomText style={pops.employtext}>출신국가</CustomText><CustomText style={pops.employcontent}>vn,ph,kh,th,id,etc,</CustomText></View>
+                    <View style={pops.employbox}><CustomText style={pops.employtext}>근무지역</CustomText><CustomText style={pops.employcontent}>seongbuk</CustomText></View>
+                    <View style={pops.employbox}><CustomText style={pops.employtext}>근무일수</CustomText><CustomText style={pops.employcontent}>week5 (everyday)</CustomText></View>
+                    <View style={pops.employbox}><CustomText style={pops.employtext}>주말근무</CustomText><CustomText style={pops.employcontent}>possible</CustomText></View>
+                    <View style={pops.employbox}><CustomText style={pops.employtext}>임금</CustomText><CustomText style={pops.employcontent}>9,860원</CustomText></View>
+                    <View style={pops.employbox}><CustomText style={pops.employtext}>모집인원</CustomText><CustomText style={pops.employcontent}>1명</CustomText></View>
+                    <View style={pops.employbox}><CustomText style={pops.employtext}>복리후생</CustomText><CustomText style={pops.employcontent}>없음</CustomText></View>
                 </View>
                 <TouchableOpacity style={pops.btnbox} onPress={() => { setYesMark(!yesmark) }}>
                     <View style={yesmark ? pops.btnclick : pops.btn}>
@@ -158,12 +143,13 @@ const EmployPop = ({ setClick }) => {
     )
 }
 
-const PageNation = () => {
+const PageNation = ({ setPage }) => {
     const [currentPage, setCurrentPage] = React.useState(1);
     const totalPages = 5;
 
     const handlePagePress = (page) => {
         setCurrentPage(page);
+        setPage(page)
     };
 
     return (
@@ -204,24 +190,57 @@ const PageNation = () => {
 };
 
 const Info = () => {
+    const accessToken = useSelector((state) => state.auth.accessToken)
     const [click, setClick] = React.useState(false)
+    const [list, setList] = React.useState([])
+    const [clicklist, setClicklist] = React.useState('')
     const [tabnow, setTabnow] = React.useState('지원센터')
+    const [page, setPage] = React.useState(1);
 
     useEffect(() => {
-        axios.get(`${URL}/info/welfare-center/list`, {
-            pageable : {
-                "page": 0,
-                "size": 12,
-                "sort": []
-            }
-        })
-            .then((res) => {
-                console.log(res.status)
+        if (tabnow === '지원센터') {
+            axios.get(`${URL}/info/welfare-center/list`, {
+                headers: {
+                    Authorization: accessToken
+                },
+                params: {
+                    page: 5,
+                    size: 8,
+                    sort: []
+                }
             })
-            .catch((err) => {
-                console.log(err)
-            })
-    }, [])
+                .then((res) => {
+                    if (res.status === 200) {
+                        setList([...res.data.welfareCenters])
+                    }
+                })
+                .catch((err) => {
+                    console.log(err)
+                })
+        } else if (tabnow === '정보 조회') {
+            setList([
+                { name: '[고용노동부] 온열질환예방OPS(OnePageSheet)...' },
+                { name: '[재난별 행동 요령] 태풍' },
+                { name: '[서식] 외국인근로자 고용허가 관련 신청서 (2024)' },
+                { name: '2024년 달라지는 제도 - 외국인·재외국민 피부양자...' },
+                { name: '친구에게 돈을 빌려주기로 했습니다. 빌려주기 전 꼭...' },
+                { name: '쉬운 한국어로 쓴 한국생활안내' },
+                { name: '[태국어] 한국의 성폭력 개념과 제도 정복하기!' },
+                { name: '[캄보디아어] 한국의 성폭력 개념과 제도 정복하기!' },
+            ])
+        } else {
+            setList([
+                { name: '[케이웨이브] 중화권 외국인환자유치 통역 및 서비스...' },
+                { name: '[단오풍정] 세신을 배울 다문화가정 여성 모집' },
+                { name: '[동작구육아종합지원센터] 동작구 어린이 영어놀이...' },
+                { name: '[グローバルエドゥパートナー] 日本人(ネイテ..' },
+                { name: '[글로벌에듀파트너] 일본인(원어민) 강사 구인' },
+                { name: '[밀알나눔재단] 기빙플러스 답십리점 매장직 오후메...' },
+                { name: '[폽타이와웨이브6] 홀서빙 및 주방보조' },
+                { name: '[KS한국고용정보] KB저축 전화응대(캄보디아)' },
+            ])
+        }
+    }, [tabnow])
 
     return (
         <>
@@ -229,15 +248,15 @@ const Info = () => {
                 <InfoHeader tabnow={tabnow} />
                 <InfoTab tabnow={tabnow} setTabnow={setTabnow} />
                 <InfoSearch />
-                <InfoList setClick={setClick} />
-                <PageNation />
+                <InfoList setClick={setClick} list={list} setClicklist={setClicklist} page={page} />
+                <PageNation setPage={setPage} />
             </ScrollView>
             {click && tabnow === '정보 조회' ? (
                 <InfoPop setClick={setClick} />
             ) : (
                 <>
                     {click && tabnow === '지원센터' ? (
-                        <CenterPop setClick={setClick} />
+                        <CenterPop setClick={setClick} clicklist={clicklist} />
                     ) : (
                         <>
                             {click && tabnow === '채용 공고' ? (
@@ -376,6 +395,14 @@ const pops = StyleSheet.create({
         paddingTop: 40,
         position: 'relative'
     },
+    employbox: {
+        marginTop: 10,
+        flexDirection: 'row',
+        alignItems: 'center'
+    },
+    employtext: {
+        fontSize: 16
+    },
     title: {
         paddingBottom: 15,
         borderBottomColor: '#303030',
@@ -384,18 +411,35 @@ const pops = StyleSheet.create({
         fontSize: 20,
         fontFamily: 'Pretendard-Medium',
     },
+    infobox: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 10
+    },
     content: {
-        paddingTop: 15,
         fontSize: 16,
         color: '#000',
-        lineHeight: 22
+        lineHeight: 22,
+        marginLeft: 5,
+        marginTop: 10
+    },
+    employcontent: {
+        fontSize: 16,
+        color: '#000',
+        lineHeight: 22,
+        marginLeft: 10,
+    },
+    mapimg: {
+        width: '100%',
+        height: 200,
+        marginTop: 10
     },
     btnbox: {
         position: 'absolute',
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
-        top: 60
+        top: 30
     },
     btn: {
         flexDirection: 'row',
@@ -429,6 +473,12 @@ const pops = StyleSheet.create({
     btntextclick: {
         fontSize: 14,
         color: '#fff'
+    },
+    downbtn: {
+        justifyContent: 'center',
+        width: '100%',
+        alignItems: 'center',
+        paddingBottom: 10
     }
 })
 
