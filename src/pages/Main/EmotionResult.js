@@ -20,7 +20,7 @@ const EmotionAnalysisResultPage = () => {
             try {
                 const response = await axios.get('http://ec2-43-202-146-22.ap-northeast-2.compute.amazonaws.com:8082/diary/view', {
                     headers: {
-                        'Authorization': `Bearer ${accessToken}`,
+                        'Authorization': `${accessToken}`,
                         'Accept': '*/*',
                     },
                 });
@@ -65,7 +65,7 @@ const EmotionAnalysisResultPage = () => {
     const data = {
         datasets: [
             {
-                data: recentData,
+                data: recentData.reverse(),
             },
         ],
     };

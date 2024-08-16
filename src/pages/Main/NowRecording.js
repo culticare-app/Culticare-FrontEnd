@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, Modal, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, Modal, FlatList, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import Voice from '@react-native-voice/voice';
+import axios from 'axios';
+import { useSelector } from 'react-redux';
 
 const DiaryStartPage = () => {
   const navigation = useNavigation();
@@ -9,6 +11,8 @@ const DiaryStartPage = () => {
   const [recordedText, setRecordedText] = useState('');
   const [selectedLanguage, setSelectedLanguage] = useState('ko-KR'); // 기본 언어 설정
   const [isLanguagePickerVisible, setIsLanguagePickerVisible] = useState(false);
+
+  const accessToken = useSelector((state) => state.auth.accessToken); // Redux에서 accessToken 가져오기
 
   const languages = [
     { label: '🇺🇸 영어 (미국)', value: 'en-US' },
@@ -151,9 +155,64 @@ const DiaryStartPage = () => {
   );
 };
 
-// 일기 끝내기 후 표시될 화면
-const DiaryEndPage = ({ route, navigation }) => {
+const DiaryEndPage = ({ route }) => {
+  const navigation = useNavigation();
   const { recordedText } = route.params;
+  const accessToken = useSelector((state) => state.auth.accessToken);
+  const [isLoading, setIsLoading] = useState(false);
+  const [gptResponse, setGptResponse] = useState('');
+
+  const handleAnalyzePress = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        'http://ec2-43-202-146-22.ap-northeast-2.compute.amazonaws.com:8082/diary/write',
+        {
+          content: recordedText,
+        },
+        {
+          headers: {
+            'Accept': '*/*',
+            'Content-Type': 'application/json',
+            'Authorization': `${accessToken}`,  // accessToken을 헤더에 추가
+          },
+        }
+      );
+
+      const { depressionPercent, content } = response.data;
+
+      navigation.navigate('ReportPage', { depressionPercent, content });
+    } catch (error) {
+      console.error('Error analyzing text:', error);
+      Alert.alert('오류 발생', '감정 분석 중 문제가 발생했습니다.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchGptResponse = async () => {
+    try {
+      const response = await axios.post(
+        'http://ec2-43-202-146-22.ap-northeast-2.compute.amazonaws.com:8082/diary/gpt',
+        { msg: recordedText },
+        {
+          headers: {
+            'Accept': '*/*',
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      setGptResponse(response.data.answer);
+    } catch (error) {
+      console.error('Error fetching GPT response:', error);
+      setGptResponse('죄송합니다. 답변을 불러오지 못했습니다.');
+    }
+  };
+
+  useEffect(() => {
+    fetchGptResponse();
+  }, [recordedText]);
 
   return (
     <View style={endStyles.container}>
@@ -163,13 +222,19 @@ const DiaryEndPage = ({ route, navigation }) => {
           <Image source={require('../../assets/images/recording/delete.png')} />
         </TouchableOpacity>
       </View>
-      <Text style={endStyles.recordingText}>기록이 종료되었습니다</Text>
-      <Text style={endStyles.thankYouText}>이야기 해줘서 고마워 :)  오늘 하루도 응원할게!</Text>
+      <ScrollView style={endStyles.scrollContainer}>
+        <Text style={endStyles.recordingText}>기록이 종료되었습니다</Text>
+        <Text style={endStyles.gptResponseText2}>이야기 해줘서 고마워 :) 오늘 하루도 응원할게!</Text>
+        <Text style={endStyles.gptResponseText}>{gptResponse}</Text>
+      </ScrollView>
       <TouchableOpacity 
         style={endStyles.analysisButton} 
-        onPress={() => navigation.navigate('ReportPage', { recordedText })}
+        onPress={handleAnalyzePress}
+        disabled={isLoading}
       >        
-        <Text style={endStyles.analysisButtonText}>감정 분석 결과 보기</Text>
+        <Text style={endStyles.analysisButtonText}>
+          {isLoading ? '분석 중...' : '감정 분석 결과 보기'}
+        </Text>
       </TouchableOpacity>
     </View>
   );
@@ -273,6 +338,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#333',
   },
+  analysisButton: {
+    height: 48,
+    backgroundColor: '#444',
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+    width: '100%',
+  },
+  analysisButtonText: {
+    fontSize: 16,
+    color: '#fff',
+  },
 });
 
 const endStyles = StyleSheet.create({
@@ -293,13 +371,24 @@ const endStyles = StyleSheet.create({
   closeButton: {
     padding: 10,
   },
+  scrollContainer: {
+    flex: 1,
+    width: '100%',
+    marginBottom: 20,
+  },
   recordingText: {
     fontSize: 16,
     color: '#ccc',
     marginTop: 0,
   },
-  thankYouText: {
-    fontSize: 24,
+  gptResponseText2: {
+    fontSize: 15,
+    color: '#fff',
+    marginTop: 20,
+    textAlign: 'center',
+  },
+  gptResponseText: {
+    fontSize: 18,
     color: '#fff',
     marginTop: 20,
     textAlign: 'center',
@@ -316,13 +405,6 @@ const endStyles = StyleSheet.create({
   analysisButtonText: {
     fontSize: 16,
     color: '#fff',
-  },
-  recordedTextConsole: {
-    fontSize: 14,
-    color: '#fff',
-    marginTop: 40,
-    marginBottom: 40,
-    textAlign: 'center',
   },
 });
 

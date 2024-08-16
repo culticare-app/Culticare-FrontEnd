@@ -27,15 +27,16 @@ const Recording = () => {
     };
 
     useEffect(() => {
+        console.log(accessToken)
         const fetchRecords = async () => {
             try {
                 const response = await axios.get(`${URL}/diary/view`, {
                     headers: {
-                        Authorization: `Bearer ${accessToken}`,
+                        Authorization: `${accessToken}`,
                         'Accept': '*/*',
                     },
                 });
-                const fetchedRecords = response.data.map((record) => ({
+                const fetchedRecords = response.data.reverse().map((record) => ({
                     id: record.id,
                     date: new Date(record.createdAt).toLocaleDateString('ko-KR'),
                     emotion: `우울감 ${record.depressionPercent}%`,
